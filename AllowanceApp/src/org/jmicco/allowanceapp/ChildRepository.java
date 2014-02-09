@@ -3,6 +3,11 @@ package org.jmicco.allowanceapp;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * 
+ * @author John
+ *
+ */
 public abstract class ChildRepository {
 
 	public static class ChildEntry {	

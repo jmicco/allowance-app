@@ -11,6 +11,12 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+/**
+ * This is the main activity for the child Allowance app
+ * 
+ * @author John
+ *
+ */
 public class MainActivity extends Activity {
 	public static final String EXTRA_MESSAGE = "org.jmicco.myfirstapp.MESSAGE";
 	int counter = 101;

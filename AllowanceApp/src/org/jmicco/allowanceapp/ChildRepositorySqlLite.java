@@ -113,11 +113,12 @@ public final class ChildRepositorySqlLite extends ChildRepository {
 
 	@Override
 	public ChildEntry getChild(String name) {
+		String [] args = { name };
 		Cursor c = db.query(
 			    Columns.TABLE_NAME,
 			    Columns.ALL_COLUMNS,
-			    Columns.COLUMN_NAME + " = " + name, 
-			    null,
+			    Columns.COLUMN_NAME + " = ?", 
+			    args,
 			    null,
 			    null,
 			    Columns.COLUMN_NAME

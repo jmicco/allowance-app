@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.jmicco.allowanceapp.DisplayMessageActivity"
+            android:name="org.jmicco.allowanceapp.AddChildActivity"
             android:label="@string/title_activity_display_message"
             android:parentActivityName="org.jmicco.allowanceapp.MainActivity" >
             <meta-data

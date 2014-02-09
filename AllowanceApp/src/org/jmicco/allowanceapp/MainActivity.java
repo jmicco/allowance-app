@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -18,6 +19,7 @@ import android.widget.ListView;
  *
  */
 public class MainActivity extends Activity {
+
 	public static final String EXTRA_MESSAGE = "org.jmicco.myfirstapp.MESSAGE";
 	int counter = 101;
 	EditText childName;
@@ -63,13 +65,6 @@ public class MainActivity extends Activity {
     	ListAdapter adapter = new ChildEntryAdapter(this, R.layout.child_list_layout, repository.getChildren());
 		childList.setAdapter(adapter);
 	}
-
-	public void sendMessage(View view) {
-    	// Do something in response to button
-    	Intent intent = new Intent(this, DisplayMessageActivity.class);
-    	intent.putExtra(EXTRA_MESSAGE, childName.getText().toString());
-    	startActivity(intent);
-    }
 
     @Override
 	protected void onDestroy() {
@@ -126,7 +121,19 @@ public class MainActivity extends Activity {
 		System.out.println("onSaveInstanceState: " + counter + " text: " + text);
 	}
 
-
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.add_child:
+			System.out.println("Add Child Selected");
+	    	// Do something in response to button
+	    	Intent intent = new Intent(this, AddChildActivity.class);
+	    	startActivity(intent);
+	    	return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
 
 
 }

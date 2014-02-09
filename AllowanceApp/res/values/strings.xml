@@ -10,4 +10,5 @@
     <string name="child_name_hint">Enter a child\'s name</string>
     <string name="button_add_child">Add Child</string>
     <string name="child_entry_default_text">Child entry</string>
+    <string name="add_child">Add Child&#8230;</string>
 </resources>

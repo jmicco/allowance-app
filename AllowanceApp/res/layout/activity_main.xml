@@ -8,34 +8,20 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
-
-	<EditText
-	    android:id="@+id/child_name"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_toLeftOf="@+id/add_child"
-	    android:hint="@string/child_name_hint" />
-	
-    <Button
-        android:id="@+id/add_child"
+    
+    <TextView 
+        android:id="@+id/prompter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/child_name"
-        android:layout_alignBottom="@+id/child_name"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="16dp"
-        android:onClick="addChild"
-        android:text="@string/button_add_child" />
-    
+        android:text="@string/prompter"
+        android:textSize="24sp"
+        />
 	<ListView 
 	    android:id="@+id/child_list"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:layout_alignLeft="@+id/child_name"
-	    android:layout_below="@+id/add_child"
 	    android:layout_marginTop="20dp"
+	    android:layout_below="@id/prompter"
 	    android:columnWidth="90dp"
 	    android:gravity="center"
 	    android:horizontalSpacing="10dp"

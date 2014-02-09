@@ -27,7 +27,7 @@ public final class ChildRepositorySqlLite extends ChildRepository {
 	}
 	
 	public static class DbHelper extends SQLiteOpenHelper {
-		public static final int DATABASE_VERSION = 1;
+		public static final int DATABASE_VERSION = 2;
 		public static final String DATABASE_NAME = "Allowance.db";
 		private static String SQL_CREATE_DATABASE =
 				"CREATE TABLE " + Columns.TABLE_NAME + " ("

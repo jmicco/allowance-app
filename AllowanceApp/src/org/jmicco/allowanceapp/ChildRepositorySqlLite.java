@@ -98,8 +98,10 @@ public final class ChildRepositorySqlLite extends ChildRepository {
 
 	@Override
 	public void updateChild(ChildEntry entry) {
-		// TODO Auto-generated method stub
-
+		ContentValues values = new ContentValues();
+		values.put(Columns.COLUMN_NAME, entry.getName());
+		values.put(Columns.COLUMN_BALANCE, entry.getBalance());
+		db.update(Columns.TABLE_NAME, values, Columns._ID + " = " + entry.getChildId(), null);
 	}
 
 	@Override

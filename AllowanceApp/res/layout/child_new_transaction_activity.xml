@@ -40,4 +40,26 @@
           android:layout_below="@id/child_new_transaction"
           android:singleLine="false"
           android:hint="@string/default_item_text"></EditText>
+
+      <Button
+          android:id="@+id/earned"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignBaseline="@+id/spent"
+          android:layout_alignBottom="@+id/spent"
+          android:layout_marginRight="28dp"
+          android:layout_toLeftOf="@+id/spent"
+          android:onClick="earnMoney"
+          android:text="@string/button_earned" />
+
+      <Button
+          android:id="@+id/spent"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentRight="true"
+          android:layout_below="@+id/transaction_item"
+          android:layout_marginRight="87dp"
+          android:onClick="spendMoney"
+          android:text="@string/button_spent" />
+
 </RelativeLayout>

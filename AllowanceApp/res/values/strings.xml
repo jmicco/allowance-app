@@ -15,4 +15,6 @@
     <string name="button_add_transaction">Add&#8230;</string>
     <string name="amount_prompt">Amount:</string>
     <string name="date_prompt">Date:</string>
+    <string name="button_earned">Earned</string>
+    <string name="button_spent">Spent</string>
 </resources>

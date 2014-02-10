@@ -22,6 +22,7 @@ import android.widget.ListView;
 public class MainActivity extends Activity {
 
 	public static final String EXTRA_CHILD_ENTRY = "org.jmicco.myfirstapp.CHILD_ENTRY";
+	public static final int DATABASE_VERSION = 1;
 	ListView childList;
 	private ChildRepository repository;
 	

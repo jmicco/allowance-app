@@ -1,5 +1,6 @@
 package org.jmicco.allowanceapp;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 
@@ -10,8 +11,9 @@ import java.util.Locale;
  */
 public abstract class ChildRepository {
 
-	public static class ChildEntry {	
+	public static class ChildEntry implements Serializable {	
 
+		private static final long serialVersionUID = 1L;
 		private long childId;
 		private String name;
 		private double balance;
@@ -44,6 +46,10 @@ public abstract class ChildRepository {
 
 		public void setName(String name) {
 			this.name = name;
+		}
+		
+		public String getFormattedBalance() {
+			return String.format("$%5.2f", balance);
 		}
 		
 		@Override

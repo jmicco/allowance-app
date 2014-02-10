@@ -34,36 +34,20 @@
         android:textSize="24sp"
         />
     </LinearLayout>
-    <LinearLayout
-        android:id="@+id/child_new_transaction"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/add_transaction"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/child_info" >
-      <EditText
-          android:id="@+id/transaction_date"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:inputType="date"
-          android:hint="@string/default_date_text"></EditText>
-      <EditText
-          android:id="@+id/transaction_item"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:hint="@string/default_item_text"></EditText>
-      <EditText
-          android:id="@+id/transaction_amount"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:inputType="numberSigned"
-          android:hint="@string/default_amount_text"></EditText>
-    </LinearLayout>    
+        android:layout_below="@id/child_info"
+        android:layout_centerInParent="true"
+        android:text="@string/button_add_transaction"
+        android:onClick="addTransaction"></Button>
     <ListView 
         android:id="@+id/transaction_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_below="@id/child_new_transaction"
+        android:layout_below="@id/add_transaction"
         android:columnWidth="90dp"
         android:gravity="center"
         android:horizontalSpacing="10dp"

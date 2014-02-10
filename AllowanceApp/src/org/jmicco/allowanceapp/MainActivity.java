@@ -21,7 +21,7 @@ import android.widget.ListView;
  */
 public class MainActivity extends Activity {
 
-	public static final String EXTRA_MESSAGE = "org.jmicco.myfirstapp.MESSAGE";
+	public static final String EXTRA_CHILD_ENTRY = "org.jmicco.myfirstapp.CHILD_ENTRY";
 	ListView childList;
 	private ChildRepository repository;
 	
@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
         ListAdapter adapter = new ChildEntryAdapter(this, R.layout.child_list_layout, repository.getChildren());
-        childList.setOnItemClickListener(new ChildEntryAdapter.ClickListener());
+        childList.setOnItemClickListener(new ClickListener());
 		childList.setAdapter(adapter);
         System.out.println("onResume");
 	}
@@ -64,7 +64,6 @@ public class MainActivity extends Activity {
 		switch (item.getItemId()) {
 		case R.id.add_child:
 			System.out.println("Add Child Selected");
-	    	// Do something in response to button
 	    	Intent intent = new Intent(this, AddChildActivity.class);
 	    	startActivity(intent);
 	    	return true;
@@ -73,5 +72,17 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+	public class ClickListener implements OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			ChildEntryAdapter adapter = (ChildEntryAdapter) parent.getAdapter();
+			ChildEntry entry = adapter.getItem(position);			
+			System.out.println("item Clicked " + entry.getName());
+	    	Intent intent = new Intent(MainActivity.this, ChildTransactionActivity.class);
+	    	intent.putExtra(EXTRA_CHILD_ENTRY, entry);
+	    	startActivity(intent);
+		}
+	}
 
 }

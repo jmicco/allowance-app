@@ -24,36 +24,41 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int add_child=0x7f08000d;
+        public static final int add_child=0x7f08000e;
         public static final int add_child_button=0x7f080001;
-        public static final int child_balance=0x7f080007;
+        public static final int add_transaction=0x7f08000c;
+        public static final int child_balance=0x7f08000b;
         public static final int child_balance_entry=0x7f080005;
-        public static final int child_info=0x7f080006;
+        public static final int child_info=0x7f08000a;
         public static final int child_list=0x7f080003;
         public static final int child_name=0x7f080000;
         public static final int child_name_entry=0x7f080004;
-        public static final int child_new_transaction=0x7f080008;
+        public static final int child_new_transaction=0x7f080006;
         public static final int prompter=0x7f080002;
-        public static final int transaction_amount=0x7f08000b;
-        public static final int transaction_date=0x7f080009;
-        public static final int transaction_item=0x7f08000a;
-        public static final int transaction_list=0x7f08000c;
+        public static final int transaction_amount=0x7f080008;
+        public static final int transaction_date=0x7f080007;
+        public static final int transaction_item=0x7f080009;
+        public static final int transaction_list=0x7f08000d;
     }
     public static final class layout {
         public static final int activity_add_child=0x7f030000;
         public static final int activity_main=0x7f030001;
         public static final int child_list_layout=0x7f030002;
-        public static final int child_transaction_activity=0x7f030003;
+        public static final int child_new_transaction_activity=0x7f030003;
+        public static final int child_transaction_activity=0x7f030004;
     }
     public static final class menu {
         public static final int main=0x7f070000;
     }
     public static final class string {
         public static final int add_child=0x7f050004;
+        public static final int amount_prompt=0x7f05000d;
         public static final int app_name=0x7f050000;
         public static final int button_add_child=0x7f050002;
+        public static final int button_add_transaction=0x7f05000c;
         public static final int child_entry_default_text=0x7f050003;
         public static final int child_name_hint=0x7f050001;
+        public static final int date_prompt=0x7f05000e;
         public static final int default_amount_text=0x7f05000b;
         public static final int default_date_text=0x7f05000a;
         public static final int default_item_text=0x7f050009;

@@ -46,7 +46,7 @@ public class ChildEntryAdapter extends ArrayAdapter<ChildRepository.ChildEntry> 
 		}
 		ChildRepository.ChildEntry childEntry = getItem(position);
 		holder.nameView.setText(childEntry.getName());
-		holder.balanceView.setText(String.format("$%5.2f", childEntry.getBalance()));
+		holder.balanceView.setText(childEntry.getFormattedBalance());
 		
 		return row;
 	}
@@ -59,16 +59,5 @@ public class ChildEntryAdapter extends ArrayAdapter<ChildRepository.ChildEntry> 
 			this.nameView = nameView;
 			this.balanceView = balanceView;
 		}
-	}
-	
-	public static class ClickListener implements OnItemClickListener {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
-			ChildEntryAdapter adapter = (ChildEntryAdapter) parent.getAdapter();
-			ChildEntry entry = adapter.getItem(position);			
-			System.out.println("item Clicked " + entry.getName());			
-		}
-		
 	}
 }

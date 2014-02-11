@@ -21,21 +21,25 @@ import android.widget.ListView;
  */
 public class MainActivity extends Activity {
 
-	public static final String EXTRA_CHILD_ENTRY = "org.jmicco.myfirstapp.CHILD_ENTRY";
-	public static final int DATABASE_VERSION = 1;
 	ListView childList;
-	private ChildRepository repository;
-	
+	private ChildRepository childRepository;
+		
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        repository = new ChildRepositorySqlLite(this); 
-        repository.open();
+        
+        childRepository = setupDatabase();
+        childRepository.open();
         setContentView(R.layout.activity_main);
         System.out.println("onCreate");
         childList = (ListView) findViewById(R.id.child_list);
 		System.out.println("onCreate");
     }
+
+	private ChildRepository setupDatabase() {		
+        childRepository = new ChildRepositorySqlLite(this); 
+        return childRepository;
+	}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -47,14 +51,14 @@ public class MainActivity extends Activity {
     @Override
 	protected void onDestroy() {
 		super.onDestroy();
-		repository.close();
+		childRepository.close();
         System.out.println("onDestroy");
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-        ListAdapter adapter = new ChildEntryAdapter(this, R.layout.child_list_layout, repository.getChildren());
+        ListAdapter adapter = new ChildEntryAdapter(this, R.layout.child_list_layout, childRepository.getChildren());
         childList.setOnItemClickListener(new ClickListener());
 		childList.setAdapter(adapter);
         System.out.println("onResume");
@@ -81,7 +85,7 @@ public class MainActivity extends Activity {
 			ChildEntry entry = adapter.getItem(position);			
 			System.out.println("item Clicked " + entry.getName());
 	    	Intent intent = new Intent(MainActivity.this, ChildTransactionActivity.class);
-	    	intent.putExtra(EXTRA_CHILD_ENTRY, entry);
+	    	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ENTRY, entry);	    	
 	    	startActivity(intent);
 		}
 	}

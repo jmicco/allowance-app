@@ -7,11 +7,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
 public final class ChildRepositorySqlLite extends ChildRepository {
-	private DbHelper dbhelper;
+	private DatabaseHelper dbhelper;
 	private SQLiteDatabase db;
 	private final Context context;
 	
@@ -24,42 +23,15 @@ public final class ChildRepositorySqlLite extends ChildRepository {
 			COLUMN_NAME,
 			COLUMN_BALANCE
 		};
-	}
-	
-	public static class DbHelper extends SQLiteOpenHelper {
-		public static final int DATABASE_VERSION = MainActivity.DATABASE_VERSION;
-		public static final String DATABASE_NAME = "Allowance.db";
-		private static String SQL_CREATE_DATABASE =
+		public static String SQL_CREATE_CHILD_TABLE =
 				"CREATE TABLE " + Columns.TABLE_NAME + " ("
 				+ Columns._ID + " INTEGER PRIMARY KEY,"
 				+ Columns.COLUMN_NAME + " TEXT,"
 				+ Columns.COLUMN_BALANCE + " DOUBLE"
 				+ ")";
 		
-		private static String SQL_DELETE_DATABASE =
+		public static String SQL_DELETE_CHILD_TABLE =
 				"DROP TABLE IF EXISTS " + Columns.TABLE_NAME;
-		
-		public DbHelper(Context context) {
-			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		}
-		
-		@Override
-		public void onCreate(SQLiteDatabase db) {
-			System.out.println("Creating the database");
-			db.execSQL(SQL_CREATE_DATABASE);
-		}
-
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			System.out.println("Destroying the database for upgrade from " + oldVersion + " to " + newVersion);
-			db.execSQL(SQL_DELETE_DATABASE);
-			onCreate(db);
-		}
-		
-		@Override
-		public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			onUpgrade(db, oldVersion, newVersion);
-		}
 	}
 	
 	public ChildRepositorySqlLite(Context context) {
@@ -134,7 +106,7 @@ public final class ChildRepositorySqlLite extends ChildRepository {
 
 	@Override
 	public void open() {
-		dbhelper = new DbHelper(context);
+		dbhelper = new DatabaseHelper(context);
 		db = dbhelper.getWritableDatabase();		
 	}
 
@@ -144,7 +116,4 @@ public final class ChildRepositorySqlLite extends ChildRepository {
 		dbhelper = null;
 		db = null;
 	}
-
-
-
 }

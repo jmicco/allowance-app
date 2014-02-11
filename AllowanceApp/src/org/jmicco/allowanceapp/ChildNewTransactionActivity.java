@@ -27,7 +27,7 @@ public class ChildNewTransactionActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.child_new_transaction_activity);
-		entry = (ChildEntry)getIntent().getSerializableExtra(MainActivity.EXTRA_CHILD_ENTRY);
+		entry = (ChildEntry)getIntent().getSerializableExtra(ExtraTagConstants.EXTRA_CHILD_ENTRY);
 		dateEntry = (EditText) findViewById(R.id.transaction_date);
 		amountEntry = (EditText) findViewById(R.id.transaction_amount);
 		itemEntry = (EditText) findViewById(R.id.transaction_item);
@@ -77,7 +77,7 @@ public class ChildNewTransactionActivity extends Activity {
 		repository.updateChild(entry);
 
     	Intent intent = new Intent(this, ChildTransactionActivity.class);
-    	intent.putExtra(MainActivity.EXTRA_CHILD_ENTRY, entry);
+    	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ENTRY, entry);
     	startActivity(intent);
 	}
 }

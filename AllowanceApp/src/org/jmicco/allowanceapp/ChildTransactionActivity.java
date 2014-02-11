@@ -26,7 +26,7 @@ public class ChildTransactionActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.child_transaction_activity);
-		entry = (ChildEntry)getIntent().getSerializableExtra(MainActivity.EXTRA_CHILD_ENTRY);
+		entry = (ChildEntry)getIntent().getSerializableExtra(ExtraTagConstants.EXTRA_CHILD_ENTRY);
 		childNameView = (TextView) findViewById(R.id.child_name);
 		childBalanceView = (TextView) findViewById(R.id.child_balance);
 		transactionList = (ListView) findViewById(R.id.transaction_list);
@@ -56,7 +56,7 @@ public class ChildTransactionActivity extends Activity {
 	public void addTransaction(View view) {
 		System.out.println("addTransaction");
 		Intent intent = new Intent(this, ChildNewTransactionActivity.class);
-    	intent.putExtra(MainActivity.EXTRA_CHILD_ENTRY, entry);
+    	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ENTRY, entry);
     	startActivity(intent);
 	}
 }

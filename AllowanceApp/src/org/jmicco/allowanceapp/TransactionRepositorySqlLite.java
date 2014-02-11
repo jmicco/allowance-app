@@ -8,12 +8,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
 public class TransactionRepositorySqlLite extends TransactionRepository {
 	private Context context;
-	private DbHelper dbhelper;
+	private DatabaseHelper dbhelper;
 	private SQLiteDatabase db;
 
 	public static class Columns  implements BaseColumns {
@@ -29,46 +28,18 @@ public class TransactionRepositorySqlLite extends TransactionRepository {
 			COLUMN_DESCRIPTION,
 			COLUMN_AMOUNT
 		};
-	}
-	
-	public static class DbHelper extends SQLiteOpenHelper {
-		public static final int DATABASE_VERSION = MainActivity.DATABASE_VERSION;
-		public static final String DATABASE_NAME = "Allowance.db";
-		private static String SQL_CREATE_DATABASE =
-				"CREATE TABLE " + Columns.TABLE_NAME + " ("
-				+ Columns._ID + " INTEGER PRIMARY KEY,"
-				+ Columns.COLUMN_CHILD_ID + " INTEGER,"
-				+ Columns.COLUMN_DATE + " INTEGER,"
-				+ Columns.COLUMN_DESCRIPTION + " TEXT,"
-				+ Columns.COLUMN_AMOUNT + " DOUBLE"
-				+ ")";
+		public static String SQL_CREATE_TRANSACTION_TABLE =
+		    "CREATE TABLE " + TABLE_NAME + " ("
+		    + Columns._ID + " INTEGER PRIMARY KEY,"
+		    + COLUMN_CHILD_ID + " INTEGER,"
+		    + COLUMN_DATE + " INTEGER,"
+		    + COLUMN_DESCRIPTION + " TEXT,"
+		    + COLUMN_AMOUNT + " DOUBLE"
+		    + ")";
 		
-		private static String SQL_DELETE_DATABASE =
+		public static String SQL_DELETE_TRANSACTION_TABLE =
 				"DROP TABLE IF EXISTS " + Columns.TABLE_NAME;
-		
-		public DbHelper(Context context) {
-			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		}
-		
-		@Override
-		public void onCreate(SQLiteDatabase db) {
-			System.out.println("Creating the transactions database");
-			db.execSQL(SQL_CREATE_DATABASE);
-		}
-
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			System.out.println("Destroying the transactions database for upgrade from " + oldVersion + " to " + newVersion);
-			db.execSQL(SQL_DELETE_DATABASE);
-			onCreate(db);
-		}
-		
-		@Override
-		public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			onUpgrade(db, oldVersion, newVersion);
-		}
 	}
-
 	
 	public TransactionRepositorySqlLite(Context context) {
 		this.context = context;
@@ -78,7 +49,7 @@ public class TransactionRepositorySqlLite extends TransactionRepository {
 	
 	@Override
 	public void open() {
-		dbhelper = new DbHelper(context);
+		dbhelper = new DatabaseHelper(context);
 		db = dbhelper.getWritableDatabase();
 	}
 

@@ -45,6 +45,7 @@ public class AddChildActivity extends Activity {
     	entry = new ChildRepository.ChildEntry(0, name, 0.0);
     	repository.addChild(entry);
     	Intent intent = new Intent(this, MainActivity.class);
+    	intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     	startActivity(intent);
     }
     

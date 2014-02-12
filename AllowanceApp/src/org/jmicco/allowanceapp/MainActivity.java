@@ -70,6 +70,7 @@ public class MainActivity extends Activity {
 		case R.id.add_child:
 			System.out.println("Add Child Selected");
 	    	Intent intent = new Intent(this, AddChildActivity.class);
+	    	intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 	    	startActivity(intent);
 	    	return true;
 		default:

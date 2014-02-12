@@ -57,6 +57,7 @@ public class ChildTransactionActivity extends Activity {
 		System.out.println("addTransaction");
 		Intent intent = new Intent(this, ChildNewTransactionActivity.class);
     	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ENTRY, entry);
+    	intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
     	startActivity(intent);
 	}
 }

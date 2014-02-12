@@ -15,7 +15,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="org.jmicco.allowanceapp.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateAlwaysHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,7 +26,7 @@
         <activity
             android:name="org.jmicco.allowanceapp.AddChildActivity"
             android:label="@string/title_bank_of_dad"
-            android:parentActivityName="org.jmicco.allowanceapp.MainActivity" >
+            android:parentActivityName="org.jmicco.allowanceapp.MainActivity" >            
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.jmicco.allowanceapp.MainActivity" />
@@ -33,7 +34,8 @@
         <activity
             android:name="org.jmicco.allowanceapp.ChildTransactionActivity"
             android:label="@string/title_bank_of_dad"
-            android:parentActivityName="org.jmicco.allowanceapp.MainActivity" >
+            android:parentActivityName="org.jmicco.allowanceapp.MainActivity" 
+            android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.jmicco.allowanceapp.MainActivity" />
@@ -41,10 +43,10 @@
         <activity
             android:name="org.jmicco.allowanceapp.ChildNewTransactionActivity"
             android:label="@string/title_bank_of_dad"
-            android:parentActivityName="org.jmicco.allowanceapp.MainActivity" >
+            android:parentActivityName="org.jmicco.allowanceapp.ChildTransactionActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.jmicco.allowanceapp.MainActivity" />
+                android:value="org.jmicco.allowanceapp.ChildTransactionActivity" />
         </activity>
     </application>
 </manifest>

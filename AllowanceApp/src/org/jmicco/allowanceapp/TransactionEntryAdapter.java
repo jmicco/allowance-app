@@ -1,5 +1,6 @@
 package org.jmicco.allowanceapp;
 
+import java.text.DateFormat;
 import java.util.List;
 
 import org.jmicco.allowanceapp.TransactionRepository.TransactionEntry;
@@ -41,7 +42,8 @@ public class TransactionEntryAdapter extends ArrayAdapter<TransactionEntry> {
 			holder = (TransactionEntryHolder) row.getTag();
 		}
 		TransactionRepository.TransactionEntry transactionEntry = getItem(position);
-		holder.dateView.setText(transactionEntry.getDate().toString());
+		DateFormat dateFormat = DateFormat.getDateInstance();
+		holder.dateView.setText(dateFormat.format(transactionEntry.getDate()));
 		holder.amountView.setText(transactionEntry.getFormattedAmount());
 		holder.descriptionView.setText(transactionEntry.getDescription());
 		

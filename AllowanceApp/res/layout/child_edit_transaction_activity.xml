@@ -58,19 +58,19 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/earned"
+            android:id="@+id/delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="earnMoney"
-            android:text="@string/button_earned"
+            android:onClick="deleteTransaction"
+            android:text="@string/button_delete"
             tools:ignore="ButtonStyle" />
 
         <Button
-            android:id="@+id/spent"
+            android:id="@+id/save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="spendMoney"
-            android:text="@string/button_spent"
+            android:onClick="saveTransaction"
+            android:text="@string/button_save"
             tools:ignore="ButtonStyle" />
 
     </LinearLayout>

@@ -86,7 +86,7 @@ public class MainActivity extends Activity {
 			ChildEntry entry = adapter.getItem(position);			
 			System.out.println("item Clicked " + entry.getName());
 	    	Intent intent = new Intent(MainActivity.this, ChildTransactionActivity.class);
-	    	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ENTRY, entry);	    	
+	    	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ID, entry.getChildId());	    	
 	    	startActivity(intent);
 		}
 	}

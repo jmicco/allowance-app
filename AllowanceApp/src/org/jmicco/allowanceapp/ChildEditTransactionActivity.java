@@ -15,9 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-
-public class ChildNewTransactionActivity extends ActivityWithSetCalendar {
-	private long childId;
+public class ChildEditTransactionActivity extends ActivityWithSetCalendar {
+	private long transactionId;
 	private Button dateEntry;
 	private EditText amountEntry;
 	private EditText itemEntry;
@@ -28,8 +27,8 @@ public class ChildNewTransactionActivity extends ActivityWithSetCalendar {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.child_new_transaction_activity);
-		childId = getIntent().getLongExtra(ExtraTagConstants.EXTRA_CHILD_ID, 0);
+		setContentView(R.layout.child_edit_transaction_activity);
+		transactionId = getIntent().getLongExtra(ExtraTagConstants.EXTRA_TRANSACTION_ID, 0);
 		dateEntry = (Button) findViewById(R.id.transaction_date);
 		amountEntry = (EditText) findViewById(R.id.transaction_amount);
 		itemEntry = (EditText) findViewById(R.id.transaction_item);
@@ -50,6 +49,10 @@ public class ChildNewTransactionActivity extends ActivityWithSetCalendar {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		TransactionEntry transactionEntry = transactionRepository.getTransaction(transactionId);
+		calendar.setTime(transactionEntry.getDate());
+		amountEntry.setText(String.format("%5.2f", transactionEntry.getAmount()));
+		itemEntry.setText(transactionEntry.getDescription());
 		updateCalendarText();
 	}
 
@@ -59,15 +62,9 @@ public class ChildNewTransactionActivity extends ActivityWithSetCalendar {
 		dateEntry.setText(dateFormat.format(date));
 	}
 
-	public void earnMoney(View view) {
-		addTransaction(true);
-	}
-	
-	public void spendMoney(View view) {
-		addTransaction(false);		
-	}
-
-	private void addTransaction(boolean earned) {
+	public void saveTransaction(View view) {
+		TransactionEntry transactionEntry = transactionRepository.getTransaction(transactionId);
+		
 		double amount = 0.0;
 		try {
 			amount = Double.valueOf(amountEntry.getText().toString().trim());
@@ -75,25 +72,38 @@ public class ChildNewTransactionActivity extends ActivityWithSetCalendar {
 			amountEntry.setError(e.getMessage());
 			return;
 		}
-		
-		if (!earned) {
-			amount = -amount;
-		}
-	
+			
 		Date date = new Date(calendar.getTimeInMillis());		
 		//
 		// This should really be a single transaction - for referential integrity
 		//
-		TransactionEntry transaction = new TransactionEntry(0L, childId, date, itemEntry.getText().toString().trim(), amount);
-		ChildEntry entry = repository.getChild(childId);
-		transactionRepository.addTransaction(transaction);
-		entry.setBalance(entry.getBalance() + amount);
+		double adjust = amount - transactionEntry.getAmount();
+		transactionEntry.setAmount(amount);
+		transactionEntry.setDate(date);
+		transactionEntry.setDescription(itemEntry.getText().toString());
+		transactionRepository.updateTransaction(transactionEntry);
+		
+		ChildEntry entry = repository.getChild(transactionEntry.getChildId());
+		entry.setBalance(entry.getBalance() + adjust);
 		repository.updateChild(entry);
 
-    	Intent intent = new Intent(this, ChildTransactionActivity.class);
+    	goBack(entry);
+	}
+
+	private void goBack(ChildEntry entry) {
+		Intent intent = new Intent(this, ChildTransactionActivity.class);
     	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ID, entry.getChildId());
     	intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     	startActivity(intent);
+	}
+	
+	public void deleteTransaction(View view) {
+		TransactionEntry transactionEntry = transactionRepository.getTransaction(transactionId);
+		transactionRepository.deleteTransaction(transactionEntry);
+		ChildEntry entry = repository.getChild(transactionEntry.getChildId());
+		entry.setBalance(entry.getBalance() - transactionEntry.getAmount());
+		repository.updateChild(entry);
+		goBack(entry);
 	}
 	
 	public void showDatePickerDialog(View v) {

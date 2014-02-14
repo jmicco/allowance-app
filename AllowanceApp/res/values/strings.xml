@@ -11,10 +11,12 @@
     <string name="empty_child_balance">balance</string>
     <string name="default_item_text">Enter a description here</string>
     <string name="default_date_text">1/1/2014</string>
-    <string name="default_amount_text">500000.00</string>
+    <string name="default_amount_text">Enter amount</string>
     <string name="button_add_transaction">Add&#8230;</string>
     <string name="amount_prompt">Amount:</string>
     <string name="date_prompt">Date:</string>
     <string name="button_earned">Earned</string>
     <string name="button_spent">Spent</string>
+    <string name="button_delete">Delete</string>
+    <string name="button_save">Save</string>
 </resources>

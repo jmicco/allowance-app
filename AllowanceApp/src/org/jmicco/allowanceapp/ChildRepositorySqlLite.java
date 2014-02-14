@@ -103,6 +103,25 @@ public final class ChildRepositorySqlLite extends ChildRepository {
 		}
 		return makeChildEntryFromCursor(c);
 	}
+	
+	@Override
+	public ChildEntry getChild(long childId) {
+		String [] args = { Long.toString(childId) };
+		Cursor c = db.query(
+			    Columns.TABLE_NAME,
+			    Columns.ALL_COLUMNS,
+			    Columns._ID + " = ?", 
+			    args,
+			    null,
+			    null,
+			    Columns.COLUMN_NAME
+		    );
+		c.moveToFirst();
+		if (c.isAfterLast()) {
+			return null;			
+		}
+		return makeChildEntryFromCursor(c);
+	}
 
 	@Override
 	public void open() {

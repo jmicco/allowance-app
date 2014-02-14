@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 
+import org.jmicco.allowanceapp.ChildRepository.ChildEntry;
+
 /**
  * Hello
  * @author John
@@ -68,4 +70,6 @@ public abstract class ChildRepository {
 	public abstract long addChild(ChildEntry entry);
 	
 	public abstract ChildEntry getChild(String name);
+
+	public abstract ChildEntry getChild(long childId);
 }

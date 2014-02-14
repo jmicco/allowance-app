@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.jmicco.allowanceapp.TransactionRepository.TransactionEntry;
+
 public abstract class TransactionRepository {
 	
 	public static class TransactionEntry implements Serializable {	
@@ -81,4 +83,8 @@ public abstract class TransactionRepository {
 	public abstract long addTransaction(TransactionEntry entry);
 	
 	public abstract void deleteTransaction(TransactionEntry entry);
+
+	public abstract TransactionEntry getTransaction(long transactionId);
+
+	public abstract void updateTransaction(TransactionEntry entry);
 }

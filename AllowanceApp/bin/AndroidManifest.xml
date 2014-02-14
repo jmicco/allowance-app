@@ -48,5 +48,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.jmicco.allowanceapp.ChildTransactionActivity" />
         </activity>
+        <activity
+            android:name="org.jmicco.allowanceapp.ChildEditTransactionActivity"
+            android:label="@string/title_bank_of_dad"
+            android:parentActivityName="org.jmicco.allowanceapp.ChildTransactionActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.jmicco.allowanceapp.ChildTransactionActivity" />
+        </activity>
     </application>
 </manifest>

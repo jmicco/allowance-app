@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.jmicco.allowanceapp.ChildRepository.ChildEntry;
+import org.jmicco.allowanceapp.ChildRepositorySqlLite.Columns;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -80,6 +83,25 @@ public class TransactionRepositorySqlLite extends TransactionRepository {
 		c.close();
 		return list;
 	}
+	
+	@Override
+	public TransactionEntry getTransaction(long transactionId) {
+		String [] args = { Long.toString(transactionId) };
+		Cursor c = db.query(
+			    Columns.TABLE_NAME,
+			    Columns.ALL_COLUMNS,
+			    Columns._ID + " = ?", 
+			    args,
+			    null,
+			    null,
+			    null
+		    );
+		c.moveToFirst();
+		if (c.isAfterLast()) {
+			return null;			
+		}
+		return makeTransactionEntryFromCursor(c);
+	}
 
 	@Override
 	public long addTransaction(TransactionEntry entry) {
@@ -95,6 +117,16 @@ public class TransactionRepositorySqlLite extends TransactionRepository {
 	@Override
 	public void deleteTransaction(TransactionEntry entry) {
 		db.delete(Columns.TABLE_NAME, Columns._ID + " = " + entry.getTransactionId(), null);
+	}
+
+	@Override
+	public void updateTransaction(TransactionEntry entry) {
+		ContentValues values = new ContentValues();
+		values.put(Columns.COLUMN_CHILD_ID, entry.getChildId());
+		values.put(Columns.COLUMN_DATE, entry.getDate().getTime());
+		values.put(Columns.COLUMN_DESCRIPTION, entry.getDescription());
+		values.put(Columns.COLUMN_AMOUNT, entry.getAmount());
+		db.update(Columns.TABLE_NAME, values, Columns._ID + " = " + entry.getTransactionId(), null);
 	}
 
 	private TransactionEntry makeTransactionEntryFromCursor(Cursor c) {

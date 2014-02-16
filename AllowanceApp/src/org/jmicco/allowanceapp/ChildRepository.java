@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 
-import org.jmicco.allowanceapp.ChildRepository.ChildEntry;
-
 /**
  * Hello
  * @author John

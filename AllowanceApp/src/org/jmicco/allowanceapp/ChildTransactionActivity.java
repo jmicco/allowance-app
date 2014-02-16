@@ -3,7 +3,6 @@ package org.jmicco.allowanceapp;
 import java.util.List;
 
 import org.jmicco.allowanceapp.ChildRepository.ChildEntry;
-import org.jmicco.allowanceapp.MainActivity.ClickListener;
 import org.jmicco.allowanceapp.TransactionRepository.TransactionEntry;
 
 import android.app.Activity;
@@ -11,10 +10,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class ChildTransactionActivity extends Activity {
 

@@ -1,5 +1,6 @@
 package org.jmicco.allowanceapp;
 
+import org.jmicco.allowanceapp.BackgroundReconcileAccountOnline.UnableToFindAccountException;
 import org.jmicco.allowanceapp.ChildRepository.ChildEntry;
 
 import android.app.Activity;
@@ -12,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * This is the main activity for the child Allowance app
@@ -23,7 +25,9 @@ public class MainActivity extends Activity {
 
 	ListView childList;
 	private ChildRepository childRepository;
-		
+	private PreferenceManagerAndroid preferenceManager;
+	private BackgroundReconcileAccountOnline onlineReconciler = null;
+	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +37,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         System.out.println("onCreate");
         childList = (ListView) findViewById(R.id.child_list);
+		preferenceManager = new PreferenceManagerAndroid(this);
 		System.out.println("onCreate");
     }
 
@@ -58,10 +63,33 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-        ListAdapter adapter = new ChildEntryAdapter(this, R.layout.child_list_layout, childRepository.getChildren());
+		checkConnectOnline();
+		ListAdapter adapter = new ChildEntryAdapter(this, R.layout.child_list_layout, childRepository.getChildren());
         childList.setOnItemClickListener(new ClickListener());
 		childList.setAdapter(adapter);
         System.out.println("onResume");
+	}
+
+	private void checkConnectOnline() {
+		Preferences preferences = preferenceManager.getPreferences();
+		if (preferences.isConnectOnline() && onlineReconciler == null) {
+			try {
+				onlineReconciler = new BackgroundReconcileAccountOnline(this);
+			} catch (UnableToFindAccountException e) {
+				setError(e.getMessage());
+				return;
+			}
+			onlineReconciler.start();
+		} else if (!preferences.isConnectOnline() && onlineReconciler != null) {
+			onlineReconciler.stop();
+			onlineReconciler = null;
+		}
+		
+	}
+
+	private void setError(String message) {
+		TextView prompter = (TextView) findViewById(R.id.prompter);
+		prompter.setError(message);
 	}
 
 	@Override
@@ -73,6 +101,10 @@ public class MainActivity extends Activity {
 	    	intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 	    	startActivity(intent);
 	    	return true;
+		case R.id.preferences:
+			intent = new Intent(this, PreferencesActivity.class);
+			startActivity(intent);
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

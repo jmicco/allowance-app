@@ -4,6 +4,8 @@ import org.jmicco.allowanceapp.BackgroundReconcileAccountOnline.UnableToFindAcco
 import org.jmicco.allowanceapp.ChildRepository.ChildEntry;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -76,7 +78,7 @@ public class MainActivity extends Activity {
 			try {
 				onlineReconciler = new BackgroundReconcileAccountOnline(this);
 			} catch (UnableToFindAccountException e) {
-				setError(e.getMessage());
+				displayError(R.string.connect_error, e.getMessage());
 				return;
 			}
 			onlineReconciler.start();
@@ -87,9 +89,19 @@ public class MainActivity extends Activity {
 		
 	}
 
-	private void setError(String message) {
-		TextView prompter = (TextView) findViewById(R.id.prompter);
-		prompter.setError(message);
+	private void displayError(int titleId, String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.dismiss();
+			}
+		});
+		builder.setMessage(message);
+		builder.setIcon(android.R.drawable.ic_dialog_alert);
+		builder.setTitle(titleId);
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 
 	@Override

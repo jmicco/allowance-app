@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.jmicco.allowanceapp"
-    android:versionCode="1"
-    android:versionName="1.03" >
-
+    android:versionCode="2"
+    android:versionName="2.0" >
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"></uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    
     <uses-sdk
         android:minSdkVersion="16"
         android:targetSdkVersion="19" />
@@ -25,6 +27,14 @@
         </activity>
         <activity
             android:name="org.jmicco.allowanceapp.AddChildActivity"
+            android:label="@string/title_bank_of_dad"
+            android:parentActivityName="org.jmicco.allowanceapp.MainActivity" >            
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.jmicco.allowanceapp.MainActivity" />
+        </activity>
+        <activity
+            android:name="org.jmicco.allowanceapp.PreferencesActivity"
             android:label="@string/title_bank_of_dad"
             android:parentActivityName="org.jmicco.allowanceapp.MainActivity" >            
             <meta-data

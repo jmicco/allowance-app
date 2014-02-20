@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.jmicco.allowanceapp.ChildRepository.ChildEntry;
-import org.jmicco.allowanceapp.ChildRepositorySqlLite.Columns;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;

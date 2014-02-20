@@ -1,5 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item android:id="@+id/add_child" android:orderInCategory="101" android:title="@string/add_child"></item>
-
+    <item android:id="@+id/preferences" android:orderInCategory="102" android:title="@string/preferences"></item>
 </menu>

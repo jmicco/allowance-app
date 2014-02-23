@@ -63,7 +63,7 @@ public class BackgroundReconcileAccountOnline {
 //		properties.setProperty(ParameterConstants.AUTO_RELOAD_REVERSE_ENABLED, "true");
 //		intent.putExtra(SymmetricService.INTENTKEY_PROPERTIES, properties);
 
-		context.startService(intent);
+//		context.startService(intent);
 	}
 
 	private static String getEmail(Context context) {

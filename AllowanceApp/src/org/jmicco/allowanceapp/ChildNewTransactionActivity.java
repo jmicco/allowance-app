@@ -33,18 +33,14 @@ public class ChildNewTransactionActivity extends ActivityWithSetCalendar {
 		dateEntry = (Button) findViewById(R.id.transaction_date);
 		amountEntry = (EditText) findViewById(R.id.transaction_amount);
 		itemEntry = (EditText) findViewById(R.id.transaction_item);
-        repository = new ChildRepositorySqlLite(this); 
-        repository.open();
-        transactionRepository = new TransactionRepositorySqlLite(this);
-        transactionRepository.open();
+        repository = MainActivity.getChildRepository(); 
+        transactionRepository = repository.getTransactionRepository();
         calendar = GregorianCalendar.getInstance();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		repository.close();
-		transactionRepository.close();
 	}
 	
 	@Override

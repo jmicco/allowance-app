@@ -72,10 +72,7 @@ public abstract class TransactionRepository {
 			return String.format(Locale.getDefault(), "%s: $%5.2f %s", date.toString(), amount, description);
 		}
 	}
-	public abstract void open();
 	
-	public abstract void close();
-
 	public abstract List<TransactionEntry> getTransactions(long childId);
 		
 	public abstract long addTransaction(TransactionEntry entry);

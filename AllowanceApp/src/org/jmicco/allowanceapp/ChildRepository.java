@@ -57,9 +57,6 @@ public abstract class ChildRepository {
 			return String.format(Locale.getDefault(), "%s : $%5.2f", name, balance);
 		}
 	}
-	public abstract void open();
-	
-	public abstract void close();
 
 	public abstract List<ChildEntry> getChildren();
 	
@@ -70,4 +67,6 @@ public abstract class ChildRepository {
 	public abstract ChildEntry getChild(String name);
 
 	public abstract ChildEntry getChild(long childId);
+	
+	public abstract TransactionRepository getTransactionRepository();
 }

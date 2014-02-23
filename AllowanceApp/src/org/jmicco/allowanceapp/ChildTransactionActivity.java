@@ -33,16 +33,13 @@ public class ChildTransactionActivity extends Activity {
 		childNameView = (TextView) findViewById(R.id.child_name);
 		childBalanceView = (TextView) findViewById(R.id.child_balance);
 		transactionList = (ListView) findViewById(R.id.transaction_list);
-		childRepository = new ChildRepositorySqlLite(this);
-		childRepository.open();
-		transactionRepository = new TransactionRepositorySqlLite(this);
-		transactionRepository.open();
+		childRepository = MainActivity.getChildRepository();
+		transactionRepository = childRepository.getTransactionRepository();
 	}
 	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		transactionRepository.close();
 	}
 
 	@Override

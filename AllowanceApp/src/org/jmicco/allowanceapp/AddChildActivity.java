@@ -25,8 +25,7 @@ public class AddChildActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_child);
 		childName = (EditText) findViewById(R.id.child_name);
-        repository = new ChildRepositorySqlLite(this); 
-        repository.open();
+        repository = MainActivity.getChildRepository();
 	}
     
     public void addChild(View view) {
@@ -50,6 +49,5 @@ public class AddChildActivity extends Activity {
     @Override
 	protected void onDestroy() {
 		super.onDestroy();
-		repository.close();
 	}
 }

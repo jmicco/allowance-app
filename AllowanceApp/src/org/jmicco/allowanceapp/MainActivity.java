@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 /**
  * This is the main activity for the child Allowance app
@@ -26,16 +25,18 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 
 	ListView childList;
-	private ChildRepository childRepository;
+	private static ChildRepository childRepository = null;
+	
 	private PreferenceManagerAndroid preferenceManager;
 	private BackgroundReconcileAccountOnline onlineReconciler = null;
+	private DatabaseHelper dbhelper;
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+		dbhelper = new DatabaseHelper(this);
+		childRepository = new ChildRepositorySqlLite(dbhelper);
         
-        childRepository = setupDatabase();
-        childRepository.open();
         setContentView(R.layout.activity_main);
         System.out.println("onCreate");
         childList = (ListView) findViewById(R.id.child_list);
@@ -43,11 +44,10 @@ public class MainActivity extends Activity {
 		System.out.println("onCreate");
     }
 
-	private ChildRepository setupDatabase() {		
-        childRepository = new ChildRepositorySqlLite(this); 
-        return childRepository;
+	public static ChildRepository getChildRepository() {
+		return childRepository;
 	}
-
+		
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -56,9 +56,14 @@ public class MainActivity extends Activity {
     }
     
     @Override
-	protected void onDestroy() {
+	protected synchronized void onDestroy() {
 		super.onDestroy();
-		childRepository.close();
+		if (onlineReconciler != null) {
+			onlineReconciler.stop();
+			onlineReconciler = null;
+		}
+		dbhelper.close();
+		childRepository = null;
         System.out.println("onDestroy");
 	}
 
@@ -76,7 +81,7 @@ public class MainActivity extends Activity {
 		Preferences preferences = preferenceManager.getPreferences();
 		if (preferences.isConnectOnline() && onlineReconciler == null) {
 			try {
-				onlineReconciler = new BackgroundReconcileAccountOnline(this);
+				onlineReconciler = new BackgroundReconcileAccountOnline(this, dbhelper);
 			} catch (UnableToFindAccountException e) {
 				displayError(R.string.connect_error, e.getMessage());
 				return;

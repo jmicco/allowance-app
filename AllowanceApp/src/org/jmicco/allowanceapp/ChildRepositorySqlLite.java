@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 public final class ChildRepositorySqlLite extends ChildRepository {
-	private DatabaseHelper dbhelper;
-	private SQLiteDatabase db;
-	private final Context context;
+	private final SQLiteDatabase db;
+	private final TransactionRepository transactionRepository;
 	
 	public static class Columns  implements BaseColumns {
 		public static final String TABLE_NAME = "child";
@@ -34,12 +32,11 @@ public final class ChildRepositorySqlLite extends ChildRepository {
 				"DROP TABLE IF EXISTS " + Columns.TABLE_NAME;
 	}
 	
-	public ChildRepositorySqlLite(Context context) {
-		this.context = context;
-		dbhelper = null;
-		db = null;
+	public ChildRepositorySqlLite(DatabaseHelper dbhelper) {
+		this.db = dbhelper.getWritableDatabase();
+		transactionRepository = new TransactionRepositorySqlLite(db);
 	}
-	
+		
 	@Override
 	public List<ChildEntry> getChildren() {
 		Cursor c = db.query(
@@ -124,15 +121,7 @@ public final class ChildRepositorySqlLite extends ChildRepository {
 	}
 
 	@Override
-	public void open() {
-		dbhelper = new DatabaseHelper(context);
-		db = dbhelper.getWritableDatabase();		
-	}
-
-	@Override
-	public void close() {
-		dbhelper.close();
-		dbhelper = null;
-		db = null;
+	public TransactionRepository getTransactionRepository() {
+		return transactionRepository;
 	}
 }

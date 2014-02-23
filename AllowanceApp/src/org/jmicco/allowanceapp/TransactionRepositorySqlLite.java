@@ -5,14 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 public class TransactionRepositorySqlLite extends TransactionRepository {
-	private Context context;
-	private DatabaseHelper dbhelper;
 	private SQLiteDatabase db;
 
 	public static class Columns  implements BaseColumns {
@@ -40,24 +37,9 @@ public class TransactionRepositorySqlLite extends TransactionRepository {
 		public static String SQL_DELETE_TRANSACTION_TABLE =
 				"DROP TABLE IF EXISTS " + Columns.TABLE_NAME;
 	}
-	
-	public TransactionRepositorySqlLite(Context context) {
-		this.context = context;
-		dbhelper = null;
-		db = null;
-	}
-	
-	@Override
-	public void open() {
-		dbhelper = new DatabaseHelper(context);
-		db = dbhelper.getWritableDatabase();
-	}
-
-	@Override
-	public void close() {
-		dbhelper.close();
-		dbhelper = null;
-		db = null;
+		
+	public TransactionRepositorySqlLite(SQLiteDatabase db) {
+		this.db = db;
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import org.jmicco.allowanceapp.TransactionRepository.TransactionEntry;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -16,7 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class ChildTransactionActivity extends Activity {
-
+	private static final String LOG_TAG = ChildTransactionActivity.class.getSimpleName();
 	private ChildEntry entry;
 	private TextView childNameView;
 	private TextView childBalanceView;
@@ -52,13 +53,10 @@ public class ChildTransactionActivity extends Activity {
         ListAdapter adapter = new TransactionEntryAdapter(this, R.layout.transaction_activity_list_layout, transactions);
         transactionList.setOnItemClickListener(new ClickListener());
 		transactionList.setAdapter(adapter);
-		for (TransactionEntry entry : transactions) {
-			System.out.println("transaction: " + entry.toString());
-		}
 	}
 	
 	public void addTransaction(View view) {
-		System.out.println("addTransaction");
+		Log.d(LOG_TAG, "addTransaction");
 		Intent intent = new Intent(this, ChildNewTransactionActivity.class);
     	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ID, entry.getChildId());
     	intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -71,7 +69,7 @@ public class ChildTransactionActivity extends Activity {
 				long id) {
 			TransactionEntryAdapter adapter = (TransactionEntryAdapter) parent.getAdapter();
 			TransactionEntry entry = adapter.getItem(position);			
-			System.out.println("item Clicked " + entry.getTransactionId());
+			Log.d(LOG_TAG, "item Clicked " + entry.getTransactionId());
 			Intent intent = new Intent(ChildTransactionActivity.this, ChildEditTransactionActivity.class);
 	    	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ID, entry.getChildId());
 	    	intent.putExtra(ExtraTagConstants.EXTRA_TRANSACTION_ID, entry.getTransactionId());

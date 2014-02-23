@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,7 @@ import android.widget.ListView;
  *
  */
 public class MainActivity extends Activity {
+	private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
 	ListView childList;
 	private static ChildRepository childRepository = null;
@@ -38,10 +40,9 @@ public class MainActivity extends Activity {
 		childRepository = new ChildRepositorySqlLite(dbhelper);
         
         setContentView(R.layout.activity_main);
-        System.out.println("onCreate");
+        Log.d(LOG_TAG, "onCreate");
         childList = (ListView) findViewById(R.id.child_list);
 		preferenceManager = new PreferenceManagerAndroid(this);
-		System.out.println("onCreate");
     }
 
 	public static ChildRepository getChildRepository() {
@@ -64,7 +65,7 @@ public class MainActivity extends Activity {
 		}
 		dbhelper.close();
 		childRepository = null;
-        System.out.println("onDestroy");
+		Log.d(LOG_TAG, "onDestroy");
 	}
 
 	@Override
@@ -74,7 +75,7 @@ public class MainActivity extends Activity {
 		ListAdapter adapter = new ChildEntryAdapter(this, R.layout.child_list_layout, childRepository.getChildren());
         childList.setOnItemClickListener(new ClickListener());
 		childList.setAdapter(adapter);
-        System.out.println("onResume");
+        Log.d(LOG_TAG, "onResume");
 	}
 
 	private void checkConnectOnline() {
@@ -113,7 +114,7 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.add_child:
-			System.out.println("Add Child Selected");
+			Log.d(LOG_TAG, "Add Child Selected");
 	    	Intent intent = new Intent(this, AddChildActivity.class);
 	    	intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 	    	startActivity(intent);
@@ -133,7 +134,7 @@ public class MainActivity extends Activity {
 				long id) {
 			ChildEntryAdapter adapter = (ChildEntryAdapter) parent.getAdapter();
 			ChildEntry entry = adapter.getItem(position);			
-			System.out.println("item Clicked " + entry.getName());
+			Log.d(LOG_TAG, "item Clicked " + entry.getName());
 	    	Intent intent = new Intent(MainActivity.this, ChildTransactionActivity.class);
 	    	intent.putExtra(ExtraTagConstants.EXTRA_CHILD_ID, entry.getChildId());	    	
 	    	startActivity(intent);

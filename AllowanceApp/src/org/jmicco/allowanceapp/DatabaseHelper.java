@@ -3,8 +3,11 @@ package org.jmicco.allowanceapp;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
+	private static final String LOG_TAG = DatabaseHelper.class.getSimpleName();
+
 	public static final int DATABASE_VERSION = 1;
 	public static final String DATABASE_NAME = "Allowance.db";
 	
@@ -23,7 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		System.out.println("Creating the transactions database");
+		Log.d(LOG_TAG, "Creating the transactions database");
 		for (String createTable : createTables) {
 			db.execSQL(createTable);
 		}
@@ -31,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		System.out.println("Destroying the transactions database for upgrade from " + oldVersion + " to " + newVersion);
+		Log.d(LOG_TAG, "Destroying the transactions database for upgrade from " + oldVersion + " to " + newVersion);
 		for (String deleteTable: deleteTables) {
 			db.execSQL(deleteTable);
 		}

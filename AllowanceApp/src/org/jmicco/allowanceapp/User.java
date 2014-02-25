@@ -1,8 +1,5 @@
-package org.jmicco.parentbank.web;
+package org.jmicco.allowanceapp;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
 public class User {
 	public String email;
 	

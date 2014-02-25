@@ -1,5 +1,12 @@
 package org.jmicco.allowanceapp;
 
+import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
 import org.json.JSONTokener;
 
 import android.accounts.Account;
@@ -7,13 +14,17 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 public class BackgroundReconcileAccountOnline {
+	private static final String LOG_TAG = BackgroundReconcileAccountOnline.class.getSimpleName();
+
 	private final String email;
 	private final String deviceId;
 	private final DatabaseHelper dbhelper;
 	private final Context context;
-	private Intent intent = null;
+	private final ScheduledExecutorService executor;
+	private final Synchronizer synchronizer;
 	
 	public static class UnableToFindAccountException extends Exception {
 		private static final long serialVersionUID = 1L;
@@ -21,51 +32,43 @@ public class BackgroundReconcileAccountOnline {
 		public UnableToFindAccountException(String message) {
 			super(message);
 		}
+
+		public UnableToFindAccountException(Exception e) {
+			super(e.getMessage(), e);
+		}
 	}
 	
 	public BackgroundReconcileAccountOnline(Context context, DatabaseHelper dbhelper) throws UnableToFindAccountException {
 		this.context = context;
 		this.dbhelper = dbhelper;
-		
+		this.executor = Executors.newScheduledThreadPool(1);
+
 		try {
 			email = getEmail(context);
 			// TODO(jmicco): This requires extra permissions - see if it can be avoided
 			TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 			deviceId = telephonyManager.getDeviceId();
+		
 		} catch (RuntimeException e) {
+			e.printStackTrace();
 			throw new UnableToFindAccountException(e.getMessage());
 		}
+		
 		if (email == null) {
 			throw new UnableToFindAccountException("Unable to find the main account for this device");
 		}
-		System.out.println("email: " + email);
-		System.out.println("deviceId: " + deviceId);
+		Log.d(LOG_TAG, "email: " + email);
+		Log.d(LOG_TAG, "deviceId: " + deviceId);
+		this.synchronizer = new Synchronizer(email, deviceId);
+		executor.scheduleAtFixedRate(synchronizer, 0, 1, TimeUnit.MINUTES);
 	}
 
 	public void stop() {
-		if (intent != null) {
-			context.stopService(intent);
-			intent = null;
-		}
+		synchronizer.stop();
+		executor.shutdown();
 	}
 
 	public void start() {
-//		SQLiteOpenHelperRegistry.register(ExtraTagConstants.EXTRA_HELPER_KEY, dbhelper);
-//		
-//		intent = new Intent(context, SymmetricService.class);
-//		
-//		intent.putExtra(SymmetricService.INTENTKEY_SQLITEOPENHELPER_REGISTRY_KEY, ExtraTagConstants.EXTRA_HELPER_KEY);
-//		intent.putExtra(SymmetricService.INTENTKEY_REGISTRATION_URL, "http://192.168.1.154:9090/sync/parentdb-000");
-//		intent.putExtra(SymmetricService.INTENTKEY_EXTERNAL_ID, "001");
-//		intent.putExtra(SymmetricService.INTENTKEY_NODE_GROUP_ID, "androidapp");
-//		intent.putExtra(SymmetricService.INTENTKEY_START_IN_BACKGROUND, true);
-//		
-//		Properties properties = new Properties();
-//		// initial load existing notes from the Client to the Server
-//		properties.setProperty(ParameterConstants.AUTO_RELOAD_REVERSE_ENABLED, "true");
-//		intent.putExtra(SymmetricService.INTENTKEY_PROPERTIES, properties);
-
-//		context.startService(intent);
 	}
 
 	private static String getEmail(Context context) {

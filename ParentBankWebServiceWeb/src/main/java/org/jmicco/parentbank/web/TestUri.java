@@ -30,6 +30,7 @@ public class TestUri {
 		expectedGroup.setMasterId(counter++);
 		
 		EntityTransaction tx = em.getTransaction();
+		tx.begin();
 		em.persist(expectedGroup);
 		tx.commit();
 		

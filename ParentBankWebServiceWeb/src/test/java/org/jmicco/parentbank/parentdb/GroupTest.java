@@ -30,9 +30,10 @@ public class GroupTest {
 	@Test
 	public void testGroup() {
 		Group expectedGroup = new Group();
-		expectedGroup.setMasterId(1234);
+		expectedGroup.setMasterId(7777);
 		
 		EntityTransaction tx = em.getTransaction();
+		tx.begin();
 		em.persist(expectedGroup);
 		tx.commit();
 		

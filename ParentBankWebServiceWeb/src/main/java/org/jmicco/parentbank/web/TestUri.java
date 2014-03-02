@@ -27,7 +27,7 @@ public class TestUri {
 	public String getMessage() {
 		
 		Group expectedGroup = new Group();
-		expectedGroup.setMasterId(counter++);
+		expectedGroup.setMasterId(Long.toString(counter++));
 		
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();

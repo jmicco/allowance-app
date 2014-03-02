@@ -11,7 +11,7 @@ import javax.persistence.Table;
 public class Group {
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long groupId;
-	private long masterId;
+	private String masterId;
 	
 	public long getGroupId() {
 		return groupId;
@@ -19,10 +19,10 @@ public class Group {
 	public void setGroupId(long groupId) {
 		this.groupId = groupId;
 	}
-	public long getMasterId() {
+	public String getMasterId() {
 		return masterId;
 	}
-	public void setMasterId(long masterId) {
+	public void setMasterId(String masterId) {
 		this.masterId = masterId;
 	}
 

@@ -23,7 +23,7 @@ CREATE TABLE `parentdb`.`transaction_journal` (
 DROP TABLE IF EXISTS `parentdb`.`child_journal`;
 CREATE TABLE `parentdb`.`child_journal` (
   `journalId` INT NOT NULL,
-  `deviceID` VARCHAR(32) NOT NULL,
+  `deviceId` VARCHAR(32) NOT NULL,
   `transactionType` INT NOT NULL,
   `timestamp` DATETIME NOT NULL,
   `childId` INT NOT NULL,

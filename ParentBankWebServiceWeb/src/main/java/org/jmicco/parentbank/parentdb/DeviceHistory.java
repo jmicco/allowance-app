@@ -17,7 +17,7 @@ public class DeviceHistory {
 	private String deviceId;
 	
 	@ManyToOne(optional=false)
-	@JoinColumn(name="groupId", nullable=false, updatable=false)
+	@JoinColumn(name="groupId", nullable=false, updatable=true)
 	private Group group;
 	
 	private long hwmChildPush;
@@ -26,6 +26,21 @@ public class DeviceHistory {
 	private long hwmTransPull;
 	
 	private String email;
+	
+	public DeviceHistory() {
+		this(null, null, null, 0L, 0L, 0L, 0L);
+	}
+	
+	public DeviceHistory(String deviceId, Group group, String email, 
+			long hwmChildPush, long hwmChildPull, long hwmTransPush, long hwmTansPull) {
+		this.deviceId = deviceId;
+		this.group = group;
+		this.hwmChildPush = hwmChildPush;
+		this.hwmChildPull = hwmChildPull;
+		this.hwmTransPush = hwmTransPush;
+		this.hwmTransPull = hwmTansPull;
+		this.email = email;
+	}
 
 	public String getDeviceId() {
 		return deviceId;

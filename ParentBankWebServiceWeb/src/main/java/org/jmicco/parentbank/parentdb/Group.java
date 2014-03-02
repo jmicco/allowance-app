@@ -13,6 +13,19 @@ public class Group {
 	private long groupId;
 	private String masterId;
 	
+	public Group() {
+		this(null);
+	}
+	
+	public Group(String masterId) {
+		this(0, masterId);
+	}
+	
+	public Group(long groupId, String masterId) {
+		this.groupId = groupId;
+		this.masterId = masterId;
+	}
+	
 	public long getGroupId() {
 		return groupId;
 	}

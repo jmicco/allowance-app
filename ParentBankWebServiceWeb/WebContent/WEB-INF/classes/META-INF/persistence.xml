@@ -9,6 +9,8 @@
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<class>org.jmicco.parentbank.parentdb.Group</class>
 		<class>org.jmicco.parentbank.parentdb.DeviceHistory</class>
+		<class>org.jmicco.parentbank.parentdb.ChildJournal</class>
+		<class>org.jmicco.parentbank.parentdb.TransactionJournal</class>
  		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />

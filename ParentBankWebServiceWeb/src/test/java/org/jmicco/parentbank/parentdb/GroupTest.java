@@ -32,10 +32,8 @@ public class GroupTest {
 	
 	@Test
 	public void testGroup() {
-		Group expectedGroup = new Group();
-		expectedGroup.setMasterId("7777");
-		Group expectedGroup2 = new Group();
-		expectedGroup2.setMasterId("8888");
+		Group expectedGroup = new Group("7777");
+		Group expectedGroup2 = new Group("8888");
 		
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();

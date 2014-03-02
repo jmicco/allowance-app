@@ -12,11 +12,20 @@ import org.junit.Test;
 public class DeviceHistoryTest {
 	private TestDatabaseHelper helper;
 	private EntityManager em;
+	private Group group;
 	
 	@Before
 	public void setUp() throws Exception {
 		helper = new TestDatabaseHelper();
 		em = helper.getEm();
+		
+		group = new Group();
+		group.setMasterId("master1234");
+		
+		EntityTransaction tx = em.getTransaction();
+		tx.begin();
+		em.persist(group);
+		tx.commit();
 	}
 
 	@After
@@ -27,28 +36,26 @@ public class DeviceHistoryTest {
 	}
 
 	@Test
-	public void testDeviceHistory() {
-		Group group = new Group();
-		group.setMasterId("master1234");
+	public void testDeviceHistory() {		
+		DeviceHistory expectedDeviceHistory = new DeviceHistory("device1234", group, "nobody@nowhere.com",
+				0L, 0L, 0L, 0L);
 		
 		EntityTransaction tx = em.getTransaction();
-		tx.begin();
-		em.persist(group);
-		tx.commit();
-		
-		DeviceHistory deviceHistory = new DeviceHistory();
-		deviceHistory.setDeviceId("device1234");
-		deviceHistory.setEmail("nobody@nowhere.com");
-		deviceHistory.setGroup(group);
-		deviceHistory.setHwmChildPull(0);
-		deviceHistory.setHwmChildPush(0);
-		deviceHistory.setHwmTransPull(0);
-		deviceHistory.setHwmTransPush(0);
-		
 		tx = em.getTransaction();
 		tx.begin();
-		em.persist(deviceHistory);
+		em.persist(expectedDeviceHistory);
 		tx.commit();
+		
+		DeviceHistory actualDeviceHistory = em.find(DeviceHistory.class, "device1234");
+		
+		assertNotNull(actualDeviceHistory);
+		assertEquals(expectedDeviceHistory.getDeviceId(), actualDeviceHistory.getDeviceId());
+		assertEquals(expectedDeviceHistory.getGroup(), actualDeviceHistory.getGroup());
+		assertEquals(expectedDeviceHistory.getEmail(), actualDeviceHistory.getEmail());
+		assertEquals(expectedDeviceHistory.getHwmChildPull(), actualDeviceHistory.getHwmChildPull());
+		assertEquals(expectedDeviceHistory.getHwmChildPush(), actualDeviceHistory.getHwmChildPush());
+		assertEquals(expectedDeviceHistory.getHwmTransPull(), actualDeviceHistory.getHwmTransPull());
+		assertEquals(expectedDeviceHistory.getHwmTransPush(), actualDeviceHistory.getHwmTransPush());
 	}
 
 }

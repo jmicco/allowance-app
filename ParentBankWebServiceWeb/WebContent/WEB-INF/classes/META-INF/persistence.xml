@@ -6,6 +6,8 @@
         <properties/>
 	</persistence-unit>	
 	<persistence-unit name="testing" transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<class>org.jmicco.parentbank.parentdb.Group</class>
  		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
@@ -18,15 +20,4 @@
         </properties>
         
 	</persistence-unit>	
-	<persistence-unit name="testing-disabled" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
- 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
-        <properties>
-           <property name="hibernate.connection.url" value="jdbc:h2:mem:test;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE" />
-            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"></property>
-            <property name="hibernate.connection.driver_class" value="org.h2.Driver" />
-            <property name="hibernate.connection.password" value="admin" />
-            <property name="hibernate.connection.username" value="admin" />
-        </properties>
-    </persistence-unit>
 </persistence>

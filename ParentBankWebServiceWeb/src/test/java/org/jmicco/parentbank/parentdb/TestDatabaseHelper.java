@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
@@ -15,7 +15,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 
 public class TestDatabaseHelper {
 	Logger logger = Logger.getLogger(TestDatabaseHelper.class.getName());
@@ -41,13 +40,16 @@ public class TestDatabaseHelper {
 			logger.info("executing: " + statement);
 			preparedStatement.execute();
 		}
-		tx.commit();
 		
-//		Query query = em.createQuery("show tables");
-//		List<String> results = query.getResultList();
-//		for (String result : results) {
-//			logger.info("Table: " + result);
-//		}
+		PreparedStatement preparedStatement = connection.prepareStatement("show tables from parentdb");
+		boolean resultsAvailable = preparedStatement.execute();
+		ResultSet resultSet = preparedStatement.getResultSet();
+		resultSet.first();
+		while (!resultSet.isAfterLast()) {
+			logger.info("Table: " + resultSet.getString(1) + " schema: " + resultSet.getString(2));
+			resultSet.next();
+		}
+		tx.commit();
 	}
 
 	private String convertStringToString(InputStream inputSql) throws IOException {

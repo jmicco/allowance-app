@@ -4,8 +4,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity(name = "groups")
+@Table(name = "groups", schema = "parentdb")
 public class Group {
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long groupId;

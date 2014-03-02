@@ -1,5 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS parentdb;
---USE parentdb
+SET SCHEMA parentdb;
 
 DROP TABLE IF EXISTS groups;
 CREATE TABLE groups (

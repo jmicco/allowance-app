@@ -1,30 +1,32 @@
 package org.jmicco.parentbank.parentdb;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class GroupTest {
-	private EntityManagerFactory emf;
+	private TestDatabaseHelper helper;
 	private EntityManager em;
 	
 	@Before
-	public void setUp() {
-		emf = Persistence.createEntityManagerFactory("GroupTest");
-		em = emf.createEntityManager();
+	public void setUp() throws IOException, SQLException {
+		helper = new TestDatabaseHelper();
+		em = helper.getEm();
 	}
 	
 	@After
 	public void tearDown() {
-		em.close();
-		emf.close();
+		helper.close();
+		helper = null;
+		em = null;
 	}
 	
 	@Test

@@ -18,7 +18,7 @@ public class TestUri {
 	private static int counter = 1234;
 	
 	public TestUri() {
-		emf = Persistence.createEntityManagerFactory("GroupTest");
+		emf = Persistence.createEntityManagerFactory("production");
 		em = emf.createEntityManager();
 	}
 	

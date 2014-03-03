@@ -21,7 +21,7 @@ import com.sun.istack.Nullable;
 @Entity(name = "child_journal")
 @Table(name = "child_journal", schema = "parentdb")
 public class ChildJournal {
-	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");
 
 	@EmbeddedId
 	private Key key;
@@ -52,11 +52,11 @@ public class ChildJournal {
 		this.name = name;		
 	}
 	
-	public Key getChildJournalId() {
-		return key;
+	public long getChildJournalId() {
+		return key.journalId;
 	}
-	public void setChildJournalId(Key childJournalId) {
-		this.key = childJournalId;
+	public void setChildJournalId(long childJournalId) {
+		this.key.journalId = childJournalId;
 	}
 	public TransactionType getTransactionType() {
 		return transactionType;

@@ -4,11 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 
+import org.jmicco.parentbank.web.ChildJournalEntry;
+import org.joda.time.Instant;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 public class SynchronizeDeviceTest {
 	private TestDatabaseHelper helper;
@@ -49,6 +55,28 @@ public class SynchronizeDeviceTest {
 		DeviceHistory actualDeviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
 		
 		assertSame(expectedDeviceHistory, actualDeviceHistory);
+	}
+	
+	@Test
+	public void testMirrorChildJournalEntries() {
+		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
+		ChildJournalEntry childJournalEntry = new ChildJournalEntry(1L, TransactionType.CREATE, 1000L, 1, "childname");
+		List<ChildJournalEntry> childJournal = ImmutableList.<ChildJournalEntry>of(childJournalEntry);
+		assertEquals(0L, deviceHistory.getHwmChildPush());
+		
+		synchronizer.mirrorChildJournalEntries(deviceHistory, 1L, childJournal);
+		ChildJournal journal = ChildJournal.find(em, 1L, deviceHistory);
+		assertNotNull(journal);
+		
+		
+		assertEquals(childJournalEntry.getChildId(), journal.getChildId());
+		assertEquals(childJournalEntry.getJournalId(), journal.getChildJournalId());
+		assertEquals(new Instant(childJournalEntry.getTimestampMillis()), journal.getTimestamp());
+		assertEquals(childJournalEntry.getName(), journal.getName());
+		assertEquals(childJournalEntry.getTransactionType(), journal.getTransactionType());
+		assertEquals(deviceHistory, journal.getDeviceHistory());
+		
+		assertEquals(1L, deviceHistory.getHwmChildPush());
 	}
 
 }

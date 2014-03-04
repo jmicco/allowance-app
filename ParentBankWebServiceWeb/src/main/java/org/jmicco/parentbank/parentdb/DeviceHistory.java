@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -12,6 +14,10 @@ import javax.persistence.Table;
  */
 @Entity(name = "device_history")
 @Table(name = "device_history", schema = "parentdb")
+@NamedQueries( {
+	@NamedQuery(name = "DeviceHistory.FindDeviceHistoryByEmail", 
+		query = "SELECT d FROM device_history d WHERE d.email = :email")
+})
 public class DeviceHistory {
 	@Id
 	private String deviceId;

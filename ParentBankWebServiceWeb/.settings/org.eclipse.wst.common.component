@@ -2,7 +2,6 @@
     <wb-module deploy-name="ParentBankWebServiceWeb">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
         <property name="context-root" value="ParentBankWebServiceWeb"/>
         <property name="java-output-path" value="/ParentBankWebServiceWeb/build/classes"/>
     </wb-module>

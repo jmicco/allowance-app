@@ -48,7 +48,7 @@ public class TransactionJournalTest {
 		tx.commit();
 		
 		TransactionJournal actualTransactionJournal = TransactionJournal.find(em, 1234L, deviceHistory);
-		assertEquals(expectedTransactionJournal.getChildJournalId(), actualTransactionJournal.getChildJournalId());
+		assertEquals(expectedTransactionJournal.getJournalId(), actualTransactionJournal.getJournalId());
 		assertEquals(expectedTransactionJournal.getTimestamp(), actualTransactionJournal.getTimestamp());
 		assertEquals(expectedTransactionJournal.getTransactionType(), actualTransactionJournal.getTransactionType());
 		assertEquals(expectedTransactionJournal.getChildId(), actualTransactionJournal.getChildId());

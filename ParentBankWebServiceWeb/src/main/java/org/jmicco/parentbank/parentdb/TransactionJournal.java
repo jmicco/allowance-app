@@ -21,7 +21,7 @@ import com.sun.istack.Nullable;
 @Entity(name = "transaction_journal")
 @Table(name = "transaction_journal", schema = "parentdb")
 public class TransactionJournal {
-	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");
 	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
 
 	@EmbeddedId
@@ -60,11 +60,11 @@ public class TransactionJournal {
 		this.amount = amount;
 	}
 	
-	public Key getChildJournalId() {
-		return key;
+	public long getJournalId() {
+		return key.journalId;
 	}
-	public void setChildJournalId(Key childJournalId) {
-		this.key = childJournalId;
+	public void setKey(long journalId) {
+		this.key.journalId = journalId;
 	}
 	public TransactionType getTransactionType() {
 		return transactionType;
@@ -120,7 +120,7 @@ public class TransactionJournal {
 	}
 
 	public Instant getDate() {
-		return date == null ? null : Instant.parse(date, DATE_TIME_FORMAT);
+		return date == null ? null : Instant.parse(date, DATE_FORMAT);
 	}
 
 	public void setDate(Instant date) {

@@ -86,6 +86,8 @@ public class SynchronizeDevice {
 		if (resultList.isEmpty()) {
 			UUID masterUUID = UUID.randomUUID();
 			group = new Group(masterUUID.toString());
+			DeviceHistory masterHistory = new DeviceHistory(group.getMasterId(), group, "", 0L, 0L, 0L, 0L);
+			em.persist(masterHistory);
 			em.persist(group);
 		} else {
 			group = resultList.get(0).getGroup();

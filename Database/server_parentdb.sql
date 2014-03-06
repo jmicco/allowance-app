@@ -41,6 +41,26 @@ CREATE TABLE `parentdb`.`device_history` (
   `email` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`deviceId`)) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
+CREATE TABLE `parentdb`.`child` (
+  `childId` INT NOT NULL AUTO_INCREMENT,
+  `deviceId` VARCHAR(36) NOT NULL,
+  `name` VARCHAR(255) NULL,
+  PRIMARY KEY (`childId`, `deviceId`));
+
+CREATE TABLE `parentdb`.`transactions` (
+  `transactionId` INT NOT NULL AUTO_INCREMENT,
+  `deviceId` VARCHAR(36) NOT NULL,
+  `childId` INT NOT NULL,
+  `date` DATE NOT NULL,
+  `description` VARCHAR(255) NULL,
+  `amount` DECIMAL(2,0) NULL,
+  PRIMARY KEY (`transactionId`, `deviceId`));
+
+CREATE TABLE `parentdb`.`sequence` (
+  `sequence` INT NOT NULL AUTO_INCREMENT,
+  `notUsed` INT,
+  PRIMARY KEY (`sequence`));  
+
 ALTER TABLE `parentdb`.`device_history` 
 ADD INDEX `groupId_idx` (`groupId` ASC);
 ALTER TABLE `parentdb`.`device_history` 

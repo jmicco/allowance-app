@@ -11,7 +11,6 @@ import javax.persistence.EntityManager;
 
 import org.jmicco.parentbank.web.ChildJournalEntry;
 import org.jmicco.parentbank.web.TransactionJournalEntry;
-import org.joda.time.DateTimeField;
 import org.joda.time.Instant;
 import org.junit.After;
 import org.junit.Before;
@@ -50,6 +49,7 @@ public class SynchronizeDeviceTest {
 		assertEquals(0L, deviceHistory.getHwmChildPush());
 		assertEquals(0L, deviceHistory.getHwmTransPull());
 		assertEquals(0L, deviceHistory.getHwmTransPush());
+		assertNotNull(em.find(DeviceHistory.class, deviceHistory.getGroup().getMasterId()));  // Make sure the sharing group has a device history
 	}
 	
 	@Test

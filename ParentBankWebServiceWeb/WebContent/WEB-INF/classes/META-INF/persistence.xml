@@ -10,7 +10,9 @@
 		<class>org.jmicco.parentbank.parentdb.Group</class>
 		<class>org.jmicco.parentbank.parentdb.DeviceHistory</class>
 		<class>org.jmicco.parentbank.parentdb.ChildJournal</class>
-		<class>org.jmicco.parentbank.parentdb.TransactionJournal</class>
+		<class>org.jmicco.parentbank.parentdb.Child</class>
+		<class>org.jmicco.parentbank.parentdb.Transaction</class>
+		<class>org.jmicco.parentbank.parentdb.Sequence</class>
  		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />

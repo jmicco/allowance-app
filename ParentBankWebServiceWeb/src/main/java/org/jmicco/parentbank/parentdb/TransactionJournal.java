@@ -10,6 +10,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.joda.time.Instant;
@@ -20,6 +22,10 @@ import com.sun.istack.Nullable;
 
 @Entity(name = "transaction_journal")
 @Table(name = "transaction_journal", schema = "parentdb")
+@NamedQueries( {
+	@NamedQuery(name = "TransactionJournal.FindNewJournalEntries", 
+		query = "SELECT c FROM child_journal c WHERE c.key.deviceId = :deviceId AND c.key.journalId > :journalId")
+})
 public class TransactionJournal {
 	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");
 	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");

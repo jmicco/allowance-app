@@ -39,6 +39,10 @@ public class Child {
 		return name;
 	}
 	
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	@Embeddable
 	private static class Key {
 		@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -62,6 +66,7 @@ public class Child {
 	
 	public void persist(EntityManager em, DeviceHistory deviceHistory) {
 		em.persist(this);
+		em.flush();
 		long journalId = Sequence.generateId(em);
 		ChildJournal journalEntry = new ChildJournal(journalId, deviceHistory, TransactionType.CREATE, new Instant(), getChildId(), getName());
 		em.persist(journalEntry);

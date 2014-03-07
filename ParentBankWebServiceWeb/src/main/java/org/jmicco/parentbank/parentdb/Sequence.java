@@ -20,6 +20,7 @@ public class Sequence {
 	public static long generateId(EntityManager em) {
 		Sequence seq = new Sequence();
 		em.persist(seq);
+		em.flush();
 		return seq.sequence;
 	}
 }

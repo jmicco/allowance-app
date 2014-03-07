@@ -12,6 +12,7 @@
 		<class>org.jmicco.parentbank.parentdb.ChildJournal</class>
 		<class>org.jmicco.parentbank.parentdb.Child</class>
 		<class>org.jmicco.parentbank.parentdb.Transaction</class>
+		<class>org.jmicco.parentbank.parentdb.TransactionJournal</class>
 		<class>org.jmicco.parentbank.parentdb.Sequence</class>
  		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<properties>

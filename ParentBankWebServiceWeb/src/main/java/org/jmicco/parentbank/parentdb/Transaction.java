@@ -54,22 +54,48 @@ public class Transaction {
 		@GeneratedValue(strategy=GenerationType.IDENTITY)
 		private long transactionId;
 		private String deviceId;
+		
+		private Key() {
+			this(0, null);
+		}
+		
+		private Key(long transactionId, String deviceId) {
+			this.transactionId = transactionId;
+			this.deviceId = deviceId;
+		}
 	}
 	
-	private double getAmount() {
+	public double getAmount() {
 		return amount;
 	}
 
-	private String getDescription() {
+	public void setAmount(double amount) {
+		this.amount = amount;		
+	}
+
+	public String getDescription() {
 		return description;
 	}
 
-	private long getChildId() {
+	public void setDescription(String description) {
+		this.description= description ;
+	}
+	
+	public long getChildId() {
 		return childId;
 	}
-
-	private long getTransactionId() {
+	
+	public long getTransactionId() {
 		return key.transactionId;
+	}
+	
+	public String getDeviceId() {
+		return key.deviceId;
+	}
+	
+	public static Transaction find(EntityManager em, long transactionId, DeviceHistory deviceHistory) {
+		Key key = new Key(transactionId, deviceHistory.getDeviceId());
+		return em.find(Transaction.class, key);
 	}
 	
 	public void persist(EntityManager em, DeviceHistory deviceHistory) {
@@ -93,4 +119,5 @@ public class Transaction {
 		TransactionJournal journalEntry = new TransactionJournal(journalId, deviceHistory, TransactionType.DELETE, new Instant(), getTransactionId(), getChildId(), getDescription(), getDate(), getAmount());
 		em.persist(journalEntry);
 	}
+
 }

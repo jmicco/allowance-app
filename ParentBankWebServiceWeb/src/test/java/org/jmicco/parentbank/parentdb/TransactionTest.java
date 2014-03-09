@@ -83,6 +83,11 @@ public class TransactionTest {
 		
 		assertEquals(4, resultList.size());
 		
+		TransactionJournal actualJournalEntry = resultList.get(0);
+		assertEquals(actualTransaction1.getAmount(), actualJournalEntry.getAmount(), 0.0);
+		assertEquals(actualTransaction1.getDescription(), actualJournalEntry.getDescription());
+		assertEquals(actualTransaction1.getChildId(), actualJournalEntry.getChildId());
+		
 //		Child actualChild = Child.find(em, expectedChild.getChildId(), deviceHistory);
 //		assertNotNull(actualChild);
 //		assertEquals(expectedChild.getChildId(), actualChild.getChildId());

@@ -9,6 +9,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+/**
+ * Add a comment to see if a push to GIT works from Eclipse
+ * @author jmicco
+ *
+ */
 public class AddChildActivity extends Activity {
 	@Override
 	protected void onResume() {

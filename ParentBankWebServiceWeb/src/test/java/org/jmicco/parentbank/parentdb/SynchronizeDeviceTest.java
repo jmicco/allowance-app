@@ -8,8 +8,11 @@ import static org.junit.Assert.assertSame;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 
 import org.jmicco.parentbank.web.ChildJournalEntry;
+import org.jmicco.parentbank.web.ClientSynchronizationRequest;
+import org.jmicco.parentbank.web.ClientSynchronizationResponse;
 import org.jmicco.parentbank.web.TransactionJournalEntry;
 import org.joda.time.Instant;
 import org.junit.After;
@@ -85,7 +88,8 @@ public class SynchronizeDeviceTest {
 		List<ChildJournalEntry> childJournal = ImmutableList.of(childJournalEntry);
 		assertEquals(0L, deviceHistory.getHwmChildPush());
 		
-		synchronizer.mirrorChildJournalEntries(deviceHistory, 1L, childJournal);
+		synchronizer.mirrorChildJournalEntries(
+				deviceHistory, em.find(DeviceHistory.class, deviceHistory.getGroup().getMasterId()), 1L, childJournal);
 		ChildJournal journal = ChildJournal.find(em, 1L, deviceHistory);
 		assertNotNull(journal);
 		
@@ -107,7 +111,8 @@ public class SynchronizeDeviceTest {
 		List<TransactionJournalEntry> transactionJournal = ImmutableList.of(transactionJournalEntry);
 		assertEquals(0L, deviceHistory.getHwmChildPush());
 		
-		synchronizer.mirrorTransactionJournalEntries(deviceHistory, 1L, transactionJournal);
+		synchronizer.mirrorTransactionJournalEntries(
+				deviceHistory, em.find(DeviceHistory.class, deviceHistory.getGroup().getMasterId()), 1L, transactionJournal);
 		TransactionJournal journal = TransactionJournal.find(em, 1L, deviceHistory);
 		assertNotNull(journal);
 		
@@ -125,6 +130,36 @@ public class SynchronizeDeviceTest {
 		
 		assertEquals(1L, deviceHistory.getHwmTransPush());
 	}
-
-
+	
+	@Test
+	public void testPush() {
+		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
+		DeviceHistory masterHistory = em.find(DeviceHistory.class, deviceHistory.getGroup().getMasterId());
+		
+		EntityTransaction tx = em.getTransaction();
+		tx.begin();
+		Child child1 = new Child(masterHistory.getDeviceId(), "child1");
+		em.persist(child1);		
+		Child child2 = new Child(masterHistory.getDeviceId(), "child2");
+		em.persist(child2);
+		em.flush();
+		Transaction transactionChild1 = new Transaction(masterHistory.getDeviceId(), child1.getChildId(), new Instant(1000L), "child1 MT1", 10.0);
+		Transaction transactionChild2 = new Transaction(masterHistory.getDeviceId(), child2.getChildId(), new Instant(1000L), "child2 MT1", 5.0);
+		em.persist(transactionChild1);
+		em.persist(transactionChild2);
+		tx.commit();
+		
+		List<ChildJournalEntry> childJournal = ImmutableList.of(
+				new ChildJournalEntry(1L, TransactionType.CREATE, 10000L, 1L, "child2"),
+				new ChildJournalEntry(2L, TransactionType.CREATE, 10000L, 1L, "child3"));
+		
+		List<TransactionJournalEntry> transactionJournal = ImmutableList.of(
+				new TransactionJournalEntry(1L, TransactionType.CREATE, 10000L, 1L, 1L, "child2 CT1", 20000L, 3.0),
+				new TransactionJournalEntry(2L, TransactionType.CREATE, 10000L, 2L, 2L, "child3 CT1", 20000L, 6.0)
+		);
+		ClientSynchronizationRequest request = 
+				new ClientSynchronizationRequest(deviceHistory.getDeviceId(), "nobody@nowhere.com", 0L, 2L, 0L, 2L, childJournal, transactionJournal);
+		ClientSynchronizationResponse response = synchronizer.push(request);
+		
+	}
 }

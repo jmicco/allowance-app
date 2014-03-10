@@ -38,7 +38,7 @@ public class DeviceHistoryTest {
 	@Test
 	public void testDeviceHistory() {		
 		DeviceHistory expectedDeviceHistory = new DeviceHistory("device1234", group, "nobody@nowhere.com",
-				0L, 0L, 0L, 0L);
+				0L, 0L, 0L, 0L, 0L, 0L);
 		
 		EntityTransaction tx = em.getTransaction();
 		tx = em.getTransaction();

@@ -27,7 +27,7 @@ public class TransactionTest {
 		
 		Group group = new Group();
 		group.setMasterId("master1234");
-		deviceHistory = new DeviceHistory("master1234", group, "nobody@nowhere.com", 0L, 0L, 0L, 0L);
+		deviceHistory = new DeviceHistory("master1234", group, "nobody@nowhere.com", 0L, 0L, 0L, 0L, 0L, 0L);
 		
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
@@ -84,50 +84,14 @@ public class TransactionTest {
 		assertEquals(4, resultList.size());
 		
 		TransactionJournal actualJournalEntry = resultList.get(0);
+		assertEquals(TransactionType.CREATE, actualJournalEntry.getTransactionType());
 		assertEquals(actualTransaction1.getAmount(), actualJournalEntry.getAmount(), 0.0);
 		assertEquals(actualTransaction1.getDescription(), actualJournalEntry.getDescription());
 		assertEquals(actualTransaction1.getChildId(), actualJournalEntry.getChildId());
+		assertEquals(actualTransaction1.getDate(), actualJournalEntry.getDate());
+		assertEquals(actualTransaction1.getDeviceId(), actualJournalEntry.getDeviceHistory().getDeviceId());
 		
-//		Child actualChild = Child.find(em, expectedChild.getChildId(), deviceHistory);
-//		assertNotNull(actualChild);
-//		assertEquals(expectedChild.getChildId(), actualChild.getChildId());
-//		assertEquals(expectedChild.getDeviceId(), actualChild.getDeviceId());
-//		assertEquals(expectedChild.getName(), actualChild.getName());
-//		
-//		TypedQuery<ChildJournal> query = em.createNamedQuery("ChildJournal.FindNewJournalEntries", ChildJournal.class);
-//		query.setParameter("journalId", 0L);
-//		query.setParameter("deviceId", actualChild.getDeviceId());
-//		List<ChildJournal> resultList = query.getResultList();
-//		
-//		assertEquals(2, resultList.size());
-//		ChildJournal actualJournal = resultList.get(0);
-//		
-//		assertEquals(deviceHistory, actualJournal.getDeviceHistory());
-//		assertEquals(actualChild.getChildId(), actualJournal.getChildId());
-//		assertEquals(actualChild.getName(), actualJournal.getName());
-//		assertEquals(TransactionType.CREATE, actualJournal.getTransactionType());
-//		
-//		expectedChild.setName("Amanda");
-//		tx.begin();
-//		expectedChild.merge(em, deviceHistory);
-//		tx.commit();
-//		
-//		query.setParameter("journalId", 2L);
-//		resultList = query.getResultList();
-//		assertEquals(1, resultList.size());
-//		
-//		actualJournal = resultList.get(0);
-//		assertEquals(TransactionType.UPDATE, actualJournal.getTransactionType());
-//		
-//		tx.begin();
-//		expectedChild.delete(em, deviceHistory);
-//		tx.commit();
-//		
-//		query.setParameter("journalId", 3L);
-//		resultList = query.getResultList();
-//		assertEquals(1, resultList.size());
-//		
-//		actualJournal = resultList.get(0);
-//		assertEquals(TransactionType.DELETE, actualJournal.getTransactionType());
+		actualJournalEntry = resultList.get(3);
+		assertEquals(TransactionType.UPDATE, actualJournalEntry.getTransactionType());
 	}
 }

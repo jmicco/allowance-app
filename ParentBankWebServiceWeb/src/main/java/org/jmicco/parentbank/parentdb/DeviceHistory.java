@@ -27,18 +27,20 @@ public class DeviceHistory {
 	private Group group;
 	
 	private long hwmChildPush;
+	private long hwmChildMasterPush;
 	private long hwmTransPush;
+	private long hwmTransMasterPush;
 	private long hwmChildPull;
 	private long hwmTransPull;
 	
 	private String email;
 	
 	public DeviceHistory() {
-		this(null, null, null, 0L, 0L, 0L, 0L);
+		this(null, null, null, 0L, 0L, 0L, 0L, 0L, 0L);
 	}
 	
 	public DeviceHistory(String deviceId, Group group, String email, 
-			long hwmChildPush, long hwmChildPull, long hwmTransPush, long hwmTansPull) {
+			long hwmChildPush, long hwmChildMasterPush, long hwmChildPull, long hwmTransPush, long hwmTransMasterPush, long hwmTansPull) {
 		this.deviceId = deviceId;
 		this.group = group;
 		this.hwmChildPush = hwmChildPush;
@@ -102,5 +104,21 @@ public class DeviceHistory {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public long getHwmChildMasterPush() {
+		return hwmChildMasterPush;
+	}
+
+	public void setHwmChildMasterPush(long hwmChildMasterPush) {
+		this.hwmChildMasterPush = hwmChildMasterPush;
+	}
+
+	public long getHwmTransMasterPush() {
+		return hwmTransMasterPush;
+	}
+
+	public void setHwmTransMasterPush(long hwmTransMasterPush) {
+		this.hwmTransMasterPush = hwmTransMasterPush;
 	}
 }

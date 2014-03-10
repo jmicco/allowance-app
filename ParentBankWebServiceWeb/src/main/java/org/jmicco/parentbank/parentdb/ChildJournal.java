@@ -24,7 +24,9 @@ import com.sun.istack.Nullable;
 @Table(name = "child_journal", schema = "parentdb")
 @NamedQueries( {
 	@NamedQuery(name = "ChildJournal.FindNewJournalEntries", 
-		query = "SELECT c FROM child_journal c WHERE c.key.deviceId = :deviceId AND c.key.journalId > :journalId")
+		query = "SELECT c FROM child_journal c WHERE c.key.deviceId = :deviceId AND c.key.journalId > :journalId"),
+	@NamedQuery(name = "ChildJournal.FindAllJournalEntries",
+		query = "SELECT c from child_journal c where c.key.deviceId = :deviceId")
 })
 public class ChildJournal {
 	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");

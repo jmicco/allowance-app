@@ -25,7 +25,7 @@ public class ChildTest {
 		
 		Group group = new Group();
 		group.setMasterId("master1234");
-		deviceHistory = new DeviceHistory("master1234", group, "nobody@nowhere.com", 0L, 0L, 0L, 0L);
+		deviceHistory = new DeviceHistory("master1234", group, "nobody@nowhere.com", 0L, 0L, 0L, 0L, 0L, 0L);
 		
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();

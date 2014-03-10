@@ -6,12 +6,18 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.joda.time.Instant;
 
 @Entity(name = "child")
 @Table(name = "child", schema = "parentdb")
+@NamedQueries( {
+	@NamedQuery(name = "Child.FindAllChildren", 
+		query = "SELECT c FROM child c WHERE c.key.deviceId = :deviceId")
+})
 public class Child {
 	@EmbeddedId
 	private Key key;

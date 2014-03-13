@@ -14,6 +14,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -26,6 +31,8 @@ import com.sun.istack.Nullable;
 	@NamedQuery(name = "TransactionJournal.FindNewJournalEntries", 
 		query = "SELECT t FROM transaction_journal t WHERE t.key.deviceId = :deviceId AND t.key.journalId > :journalId")
 })
+@EqualsAndHashCode
+@ToString
 public class TransactionJournal {
 	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");
 	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -35,18 +42,18 @@ public class TransactionJournal {
 	
 	@ManyToOne
 	@JoinColumn(name = "deviceId", insertable = false, updatable = false)
-	private DeviceHistory deviceHistory;
+	@Getter private DeviceHistory deviceHistory;
 	
 	@Enumerated(EnumType.ORDINAL)
-	private TransactionType transactionType;
+	@Getter @Setter private TransactionType transactionType;
 	
 	private String timestamp;
 
-	private long transactionId;
-	private long childId;
-	private String description;
+	@Getter @Setter private long transactionId;
+	@Getter @Setter private long childId;
+	@Getter @Setter private String description;
 	private String date;
-	private double amount;
+	@Getter @Setter private double amount;
 	
 	public TransactionJournal() {
 		this(0, null, null, null, 0L, 0L, null, null, 0.0);
@@ -72,12 +79,6 @@ public class TransactionJournal {
 	public void setKey(long journalId) {
 		this.key.journalId = journalId;
 	}
-	public TransactionType getTransactionType() {
-		return transactionType;
-	}
-	public void setTransactionType(TransactionType transactionType) {
-		this.transactionType = transactionType;
-	}
 	public Instant getTimestamp() {		
 		return timestamp == null ? null : Instant.parse(timestamp, DATE_TIME_FORMAT);
 	}
@@ -88,16 +89,6 @@ public class TransactionJournal {
 			this.timestamp = timestamp.toString(DATE_TIME_FORMAT);
 		}
 	}
-	public long getChildId() {
-		return childId;
-	}
-	public void setChildId(long childId) {
-		this.childId = childId;
-	}
-
-	public DeviceHistory getDeviceHistory() {
-		return deviceHistory;
-	}
 
 	public void setDeviceHistory(@Nullable DeviceHistory deviceHistory) {
 		this.deviceHistory = deviceHistory;
@@ -107,22 +98,6 @@ public class TransactionJournal {
 	public static TransactionJournal find(EntityManager em, long journalId, DeviceHistory deviceHistory) {
 		Key key = new Key(journalId, deviceHistory.getDeviceId());
 		return em.find(TransactionJournal.class, key);
-	}
-	
-	public long getTransactionId() {
-		return transactionId;
-	}
-
-	public void setTransactionId(long transactionId) {
-		this.transactionId = transactionId;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public Instant getDate() {
@@ -135,14 +110,6 @@ public class TransactionJournal {
 		} else {
 			this.date = date.toString(DATE_FORMAT);
 		}
-	}
-
-	public double getAmount() {
-		return amount;
-	}
-
-	public void setAmount(double amount) {
-		this.amount = amount;
 	}
 
 	@Embeddable

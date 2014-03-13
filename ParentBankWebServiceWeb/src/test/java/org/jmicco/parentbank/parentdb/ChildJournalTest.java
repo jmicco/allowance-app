@@ -48,7 +48,7 @@ public class ChildJournalTest {
 		tx.commit();
 		
 		ChildJournal actualChildJournal = ChildJournal.find(em, 1234L, deviceHistory);
-		assertEquals(expectedChildJournal.getChildJournalId(), actualChildJournal.getChildJournalId());
+		assertEquals(expectedChildJournal.getJournalId(), actualChildJournal.getJournalId());
 		assertEquals(expectedChildJournal.getTimestamp(), actualChildJournal.getTimestamp());
 		assertEquals(expectedChildJournal.getTransactionType(), actualChildJournal.getTransactionType());
 		assertEquals(expectedChildJournal.getChildId(), actualChildJournal.getChildId());

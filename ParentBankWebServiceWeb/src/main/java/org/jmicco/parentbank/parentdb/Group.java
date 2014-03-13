@@ -6,12 +6,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 @Entity(name = "groups")
 @Table(name = "groups", schema = "parentdb")
+@EqualsAndHashCode
+@ToString
 public class Group {
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-	private long groupId;
-	private String masterId;
+	@Getter @Setter private long groupId;
+	@Getter @Setter private String masterId;
 	
 	public Group() {
 		this(null);
@@ -25,18 +32,4 @@ public class Group {
 		this.groupId = groupId;
 		this.masterId = masterId;
 	}
-	
-	public long getGroupId() {
-		return groupId;
-	}
-	public void setGroupId(long groupId) {
-		this.groupId = groupId;
-	}
-	public String getMasterId() {
-		return masterId;
-	}
-	public void setMasterId(String masterId) {
-		this.masterId = masterId;
-	}
-
 }

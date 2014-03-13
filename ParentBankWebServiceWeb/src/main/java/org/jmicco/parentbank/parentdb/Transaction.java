@@ -8,21 +8,28 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Table;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 @Entity(name = "transactions")
 @Table(name = "transactions", schema = "parentdb")
+@EqualsAndHashCode
+@ToString
 public class Transaction {
 	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
 
 	@EmbeddedId
 	private Key key;
-	private long childId;
+	@Getter @Setter private long childId;
 	private String date;
-	private String description;
-	private double amount;
+	@Getter @Setter private String description;
+	@Getter @Setter private double amount;
 	
 	public Transaction() {
 		this(null, 0L, null, null, 0.0);
@@ -65,26 +72,6 @@ public class Transaction {
 		}
 	}
 	
-	public double getAmount() {
-		return amount;
-	}
-
-	public void setAmount(double amount) {
-		this.amount = amount;		
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description= description ;
-	}
-	
-	public long getChildId() {
-		return childId;
-	}
-	
 	public long getTransactionId() {
 		return key.transactionId;
 	}
@@ -104,7 +91,6 @@ public class Transaction {
 		TransactionJournal journalEntry = new TransactionJournal(journalId, deviceHistory, TransactionType.CREATE, new Instant(), getTransactionId(), getChildId(), getDescription(), getDate(), getAmount());
 		em.persist(journalEntry);
 	}
-
 
 	public void merge(EntityManager em, DeviceHistory deviceHistory) {
 		em.merge(this);

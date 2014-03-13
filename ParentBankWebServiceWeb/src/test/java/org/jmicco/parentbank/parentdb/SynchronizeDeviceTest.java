@@ -95,7 +95,7 @@ public class SynchronizeDeviceTest {
 		
 		
 		assertEquals(childJournalEntry.getChildId(), journal.getChildId());
-		assertEquals(childJournalEntry.getJournalId(), journal.getChildJournalId());
+		assertEquals(childJournalEntry.getJournalId(), journal.getJournalId());
 		assertEquals(new Instant(childJournalEntry.getTimestampMillis()), journal.getTimestamp());
 		assertEquals(childJournalEntry.getName(), journal.getName());
 		assertEquals(childJournalEntry.getTransactionType(), journal.getTransactionType());
@@ -139,14 +139,14 @@ public class SynchronizeDeviceTest {
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
 		Child child1 = new Child(masterHistory.getDeviceId(), "child1");
-		em.persist(child1);		
+		child1.persist(em, masterHistory);	
 		Child child2 = new Child(masterHistory.getDeviceId(), "child2");
-		em.persist(child2);
+		child2.persist(em, masterHistory);
 		em.flush();
 		Transaction transactionChild1 = new Transaction(masterHistory.getDeviceId(), child1.getChildId(), new Instant(1000L), "child1 MT1", 10.0);
 		Transaction transactionChild2 = new Transaction(masterHistory.getDeviceId(), child2.getChildId(), new Instant(1000L), "child2 MT1", 5.0);
-		em.persist(transactionChild1);
-		em.persist(transactionChild2);
+		transactionChild1.persist(em, masterHistory);
+		transactionChild2.persist(em, masterHistory);
 		tx.commit();
 		
 		List<ChildJournalEntry> childJournal = ImmutableList.of(
@@ -160,6 +160,17 @@ public class SynchronizeDeviceTest {
 		ClientSynchronizationRequest request = 
 				new ClientSynchronizationRequest(deviceHistory.getDeviceId(), "nobody@nowhere.com", 0L, 2L, 0L, 2L, childJournal, transactionJournal);
 		ClientSynchronizationResponse response = synchronizer.push(request);
-		
+		assertEquals(2, response.getHwmChildPull());
+		assertEquals(4, response.getHwmTransPull());
+		ChildJournalEntry actualChildJournal = response.getChildJournal().get(0);
+		assertEquals(new ChildJournalEntry(1, TransactionType.CREATE, actualChildJournal.getTimestampMillis(), 1, "child1"), actualChildJournal);
+		actualChildJournal = response.getChildJournal().get(1);
+		assertEquals(new ChildJournalEntry(2, TransactionType.CREATE, actualChildJournal.getTimestampMillis(), 2, "child2"), actualChildJournal);
+		TransactionJournalEntry actualTransactionJournal = response.getTransactionJournal().get(0);
+		assertEquals(new TransactionJournalEntry(3, TransactionType.CREATE, actualTransactionJournal.getTimestampMillis(), 1, 
+				child1.getChildId(), "child1 MT1", transactionChild1.getDate().getMillis(), 10.0), actualTransactionJournal);
+		actualTransactionJournal = response.getTransactionJournal().get(1);
+		assertEquals(new TransactionJournalEntry(4, TransactionType.CREATE, actualTransactionJournal.getTimestampMillis(), 2, 
+				child2.getChildId(), "child2 MT1", transactionChild1.getDate().getMillis(), 5.0), actualTransactionJournal);
 	}
 }

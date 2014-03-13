@@ -83,7 +83,7 @@ public class SynchronizeDevice {
 		
 		// Bundle and send any child journal entries back to the requestor
 		// Finally apply new client transactions to the Master list - do not update the pull hwm until the client comes back			
-		return new ClientSynchronizationResponse();
+		return response;
 	}
 
 	private long findNewTransactionJournalEntries(
@@ -99,7 +99,7 @@ public class SynchronizeDevice {
 					new TransactionJournalEntry(journal.getJournalId(), journal.getTransactionType(), journal.getTimestamp().getMillis(),
 							journal.getTransactionId(), journal.getChildId(), journal.getDescription(), journal.getDate().getMillis(),
 							journal.getAmount()));
-			result = Math.max(result, journal.getTransactionId());
+			result = Math.max(result, journal.getJournalId());
 		}
 		return result;
 	}
@@ -112,9 +112,9 @@ public class SynchronizeDevice {
 		long result = hwmChildPull;
 		for (ChildJournal journal : childJournalEntries) {
 			newChildEntries.add(
-					new ChildJournalEntry(journal.getChildJournalId(), journal.getTransactionType(), journal.getTimestamp().getMillis(),
+					new ChildJournalEntry(journal.getJournalId(), journal.getTransactionType(), journal.getTimestamp().getMillis(),
 							journal.getChildId(), journal.getName()));
-			result = Math.max(result, journal.getChildJournalId());
+			result = Math.max(result, journal.getJournalId());
 		}
 		return result;
 	}

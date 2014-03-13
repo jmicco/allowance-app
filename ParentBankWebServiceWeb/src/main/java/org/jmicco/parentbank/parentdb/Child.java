@@ -10,6 +10,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import org.joda.time.Instant;
 
 @Entity(name = "child")
@@ -18,11 +23,13 @@ import org.joda.time.Instant;
 	@NamedQuery(name = "Child.FindAllChildren", 
 		query = "SELECT c FROM child c WHERE c.key.deviceId = :deviceId")
 })
+@EqualsAndHashCode
+@ToString
 public class Child {
 	@EmbeddedId
 	private Key key;
 	
-	String name;
+	@Getter @Setter String name;
 	
 	public Child() {
 		this("", "");
@@ -39,14 +46,6 @@ public class Child {
 	
 	public String getDeviceId() {
 		return key.deviceId;
-	}
-
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	@Embeddable
@@ -74,21 +73,21 @@ public class Child {
 		em.persist(this);
 		em.flush();
 		long journalId = Sequence.generateId(em);
-		ChildJournal journalEntry = new ChildJournal(journalId, deviceHistory, TransactionType.CREATE, new Instant(), getChildId(), getName());
+		ChildJournal journalEntry = new ChildJournal(journalId, deviceHistory, TransactionType.CREATE, new Instant(), getChildId(), name);
 		em.persist(journalEntry);
 	}
 	
 	public void merge(EntityManager em, DeviceHistory deviceHistory) {
 		em.merge(this);
 		long journalId = Sequence.generateId(em);
-		ChildJournal journalEntry = new ChildJournal(journalId, deviceHistory, TransactionType.UPDATE, new Instant(), getChildId(), getName());
+		ChildJournal journalEntry = new ChildJournal(journalId, deviceHistory, TransactionType.UPDATE, new Instant(), getChildId(), name);
 		em.persist(journalEntry);		
 	}
 	
 	public void delete(EntityManager em, DeviceHistory deviceHistory) {
 		em.detach(this);
 		long journalId = Sequence.generateId(em);
-		ChildJournal journalEntry = new ChildJournal(journalId, deviceHistory, TransactionType.DELETE, new Instant(), getChildId(), getName());
+		ChildJournal journalEntry = new ChildJournal(journalId, deviceHistory, TransactionType.DELETE, new Instant(), getChildId(), name);
 		em.persist(journalEntry);
 	}
 }

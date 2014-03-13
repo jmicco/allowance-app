@@ -14,6 +14,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -28,6 +33,8 @@ import com.sun.istack.Nullable;
 	@NamedQuery(name = "ChildJournal.FindAllJournalEntries",
 		query = "SELECT c from child_journal c where c.key.deviceId = :deviceId")
 })
+@EqualsAndHashCode
+@ToString
 public class ChildJournal {
 	private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");
 
@@ -36,14 +43,14 @@ public class ChildJournal {
 	
 	@ManyToOne
 	@JoinColumn(name = "deviceId", insertable = false, updatable = false)
-	private DeviceHistory deviceHistory;
+	@Getter private DeviceHistory deviceHistory;
 	
 	@Enumerated(EnumType.ORDINAL)
-	private TransactionType transactionType;
+	@Getter @Setter private TransactionType transactionType;
 	
 	private String timestamp;
-	private long childId;
-	private String name;
+	@Getter @Setter private long childId;
+	@Getter @Setter private String name;
 	
 	public ChildJournal() {
 		this(0, null, null, null, 0L, null);
@@ -60,43 +67,24 @@ public class ChildJournal {
 		this.name = name;		
 	}
 	
-	public long getChildJournalId() {
+	public long getJournalId() {
 		return key.journalId;
 	}
-	public void setChildJournalId(long childJournalId) {
+	
+	public void setJournalId(long childJournalId) {
 		this.key.journalId = childJournalId;
 	}
-	public TransactionType getTransactionType() {
-		return transactionType;
-	}
-	public void setTransactionType(TransactionType transactionType) {
-		this.transactionType = transactionType;
-	}
+	
 	public Instant getTimestamp() {
 		return timestamp == null ? null : Instant.parse(timestamp, DATE_TIME_FORMAT);
 	}
+	
 	public void setTimestamp(@Nullable Instant timestamp) {
 		if (timestamp == null) {
 			this.timestamp = null;
 		} else {
 			this.timestamp = timestamp.toString(DATE_TIME_FORMAT);
 		}
-	}
-	public long getChildId() {
-		return childId;
-	}
-	public void setChildId(long childId) {
-		this.childId = childId;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public DeviceHistory getDeviceHistory() {
-		return deviceHistory;
 	}
 
 	public void setDeviceHistory(@Nullable DeviceHistory deviceHistory) {
@@ -110,6 +98,7 @@ public class ChildJournal {
 	}
 	
 	@Embeddable
+	@EqualsAndHashCode
 	private static class Key implements Serializable {
 		private static final long serialVersionUID = 1L;
 

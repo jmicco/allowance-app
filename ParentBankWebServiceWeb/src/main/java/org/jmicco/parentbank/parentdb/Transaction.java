@@ -57,6 +57,8 @@ public class Transaction {
 	}
 
 	@Embeddable
+	@EqualsAndHashCode
+	@ToString
 	private static class Key {
 		@GeneratedValue(strategy=GenerationType.IDENTITY)
 		private long transactionId;
@@ -85,11 +87,13 @@ public class Transaction {
 		return em.find(Transaction.class, key);
 	}
 	
-	public void persist(EntityManager em, DeviceHistory deviceHistory) {
+	public long persist(EntityManager em, DeviceHistory deviceHistory) {
 		em.persist(this);
 		long journalId = Sequence.generateId(em);
 		TransactionJournal journalEntry = new TransactionJournal(journalId, deviceHistory, TransactionType.CREATE, new Instant(), getTransactionId(), getChildId(), getDescription(), getDate(), getAmount());
 		em.persist(journalEntry);
+		em.flush();
+		return journalEntry.getJournalId();
 	}
 
 	public void merge(EntityManager em, DeviceHistory deviceHistory) {

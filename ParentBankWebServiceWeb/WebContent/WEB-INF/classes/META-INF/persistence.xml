@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 	<persistence-unit name="production" transaction-type="JTA">
-		<jta-data-source>jdbc/parentdb</jta-data-source>
+		<jta-data-source>jdbc/parentdb</jta-data-source>	
+		<class>org.jmicco.parentbank.parentdb.Group</class>
+		<class>org.jmicco.parentbank.parentdb.DeviceHistory</class>
+		<class>org.jmicco.parentbank.parentdb.ChildJournal</class>
+		<class>org.jmicco.parentbank.parentdb.Child</class>
+		<class>org.jmicco.parentbank.parentdb.Transaction</class>
+		<class>org.jmicco.parentbank.parentdb.TransactionJournal</class>
+		<class>org.jmicco.parentbank.parentdb.Sequence</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties/>
 	</persistence-unit>	

@@ -31,7 +31,9 @@ import com.sun.istack.Nullable;
 	@NamedQuery(name = "ChildJournal.FindNewJournalEntries", 
 		query = "SELECT c FROM child_journal c WHERE c.key.deviceId = :deviceId AND c.key.journalId > :journalId"),
 	@NamedQuery(name = "ChildJournal.FindAllJournalEntries",
-		query = "SELECT c from child_journal c where c.key.deviceId = :deviceId")
+		query = "SELECT c from child_journal c where c.key.deviceId = :deviceId"),
+	@NamedQuery(name = "ChildJournal.FindMasterPushJournalEntries",
+		query = "SELECT c from child_journal c where c.key.deviceId = :deviceId and c.key.journalId > :masterPushJournalId and c.key.journalId <= :pushJournalId")
 })
 @EqualsAndHashCode
 @ToString
@@ -99,6 +101,7 @@ public class ChildJournal {
 	
 	@Embeddable
 	@EqualsAndHashCode
+	@ToString
 	private static class Key implements Serializable {
 		private static final long serialVersionUID = 1L;
 

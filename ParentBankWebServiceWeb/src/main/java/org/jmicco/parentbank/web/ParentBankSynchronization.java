@@ -36,11 +36,11 @@ public class ParentBankSynchronization {
 	
 	@GET
 	@Path("/synchronize")
-	public ClientSynchronizationRequest synchronize() {
+	public ClientPushPullRequest synchronize() {
 		Persistence.createEntityManagerFactory("production").createEntityManager();
 		List<ChildJournalEntry> childJournal = ImmutableList.of(new ChildJournalEntry(5L, TransactionType.CREATE, 10000L, 6L, "childname"));
 		List<TransactionJournalEntry> transactionJournal = 
 				ImmutableList.of(new TransactionJournalEntry(7L, TransactionType.UPDATE, 20000L, 8L, 9L, "Allowance", 30000L, 10.0));
-		return new ClientSynchronizationRequest("device1234", "nobody@nowhere.com", 1L, 2L, 3L, 4L, childJournal, transactionJournal);
+		return new ClientPushPullRequest("device1234", "nobody@nowhere.com", 1L, 2L, 3L, 4L, childJournal, transactionJournal);
 	}
 }

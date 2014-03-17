@@ -6,11 +6,13 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NamedQuery;
 import javax.persistence.TypedQuery;
 
 import org.jmicco.parentbank.web.ChildJournalEntry;
-import org.jmicco.parentbank.web.ClientSynchronizationRequest;
-import org.jmicco.parentbank.web.ClientSynchronizationResponse;
+import org.jmicco.parentbank.web.ClientPullResponse;
+import org.jmicco.parentbank.web.ClientPushPullRequest;
+import org.jmicco.parentbank.web.ClientPushResponse;
 import org.jmicco.parentbank.web.TransactionJournalEntry;
 import org.joda.time.Instant;
 
@@ -33,24 +35,27 @@ public class SynchronizeDevice {
 	//    * Update hwmPushX to match the new top
 	// 3. Return the new transactions and hwmPush to the client
 	// 
-	// During the pull
-	// 1. mirror all transactions to the master between hwmMasterPush and hwmPush
-	//    * update hwmMasterPushX to hwmPushX
-	//    * update hwmPull to new top
-	// 2. Client request contains new journal entries that should be mirrored into the 
-	//    device-specific journal that were already applied to the master
-	//    * mirror the transactions to the device journal
-	//    * update hwmMasterPush and hwmPush to the new top
-	// 3. return the new hwmPush / hwmPull to the client.
-	//	
-	public ClientSynchronizationResponse push(ClientSynchronizationRequest request) {
-		ClientSynchronizationResponse response = new ClientSynchronizationResponse();
+
+	public ClientPushResponse push(ClientPushPullRequest request) {
+		ClientPushResponse response = new ClientPushResponse();
+		EntityTransaction tx = em.getTransaction();
+		tx.begin();
 		
 		// Get the deviceHistory for this device
 		DeviceHistory deviceHistory = findOrCreateDeviceHistory(request.getDeviceId(), request.getEmail());
 		// Find the masterHistory as well
 		DeviceHistory masterHistory = em.find(DeviceHistory.class, deviceHistory.getGroup().getMasterId());
 
+		// Update the pull level only when the child says that it is done
+		// This prevents crashes on either end from corrupting the data.		
+		if (request.getHwmChildPull() > deviceHistory.getHwmChildPull()) {
+			deviceHistory.setHwmChildPull(request.getHwmChildPull());			tx.commit();
+		}
+		
+		if (request.getHwmTransPull() > deviceHistory.getHwmTransPull()) {
+			deviceHistory.setHwmTransPull(request.getHwmTransPull());
+		}
+		
 		// Fill in the response with new journal entries
 		List<ChildJournalEntry> newChildEntries = Lists.newArrayList();
 		response.setHwmChildPull(findNewChildJournalEntries(newChildEntries, masterHistory, request.getHwmChildPull()));
@@ -59,31 +64,113 @@ public class SynchronizeDevice {
 		List<TransactionJournalEntry> newTransactionEntries = Lists.newArrayList();
 		response.setHwmTransPull(findNewTransactionJournalEntries(newTransactionEntries, masterHistory, request.getHwmTransPull()));
 		response.setTransactionJournal(newTransactionEntries);
-		EntityTransaction tx = em.getTransaction();
-		
-		// Update the pull level only when the child says that it is done
-		// This prevents crashes on either end from corrupting the data.		
-		if (request.getHwmChildPull() > deviceHistory.getHwmChildPull()) {
-			tx.begin();
-			deviceHistory.setHwmChildPull(request.getHwmChildPull());
-			tx.commit();
-		}
-		
-		if (request.getHwmTransPull() > deviceHistory.getHwmTransPull()) {
-			tx.begin();
-			deviceHistory.setHwmTransPull(request.getHwmTransPull());
-			tx.commit();
-		}
-		
+
 		// If there are new child journal entries mirror them
-		mirrorChildJournalEntries(deviceHistory, masterHistory, request.getHwmChildPush(), request.getChildJournal());
+		mirrorChildJournalEntries(deviceHistory, request.getHwmChildPush(), request.getChildJournal());
 		// If there are new transaction journal entries mirror them
-		mirrorTransactionJournalEntries(deviceHistory, masterHistory, request.getHwmTransPush(), request.getTransactionJournal());
+		mirrorTransactionJournalEntries(deviceHistory, request.getHwmTransPush(), request.getTransactionJournal());
 		// Mirror the transactions into the repository
 		
+		em.merge(deviceHistory);
+		tx.commit();
 		// Bundle and send any child journal entries back to the requestor
 		// Finally apply new client transactions to the Master list - do not update the pull hwm until the client comes back			
 		return response;
+	}
+
+	// During the pull
+	// 1. Apply all of the transactions between hwmMasterPushX and hwmPushX to the master repo
+	// 2. mirror all of the new transactions to the device transaction log
+	// 3. set hwmPushX = hwmMasterPushX = highest transaction seen
+	// 4. Update the hwmPullX = hwmPull from the client
+	// 5. Commit and return the new hwmPush / Pull
+	public ClientPullResponse pull(ClientPushPullRequest request) {
+		ClientPullResponse response = new ClientPullResponse();
+		EntityTransaction tx = em.getTransaction();
+		tx.begin();	
+		
+		// Get the deviceHistory for this device - it should exist
+		DeviceHistory deviceHistory = em.find(DeviceHistory.class, request.getDeviceId());
+		// Find the masterHistory as well
+		DeviceHistory masterHistory = em.find(DeviceHistory.class, deviceHistory.getGroup().getMasterId());
+
+		response.setHwmChildPull(applyChildJournalToMaster(deviceHistory, masterHistory));
+		response.setHwmTransPull(applyTransactionJournalToMaster(deviceHistory, masterHistory));
+		
+		mirrorChildJournalEntries(deviceHistory, request.getHwmChildPush(), request.getChildJournal());
+		mirrorTransactionJournalEntries(deviceHistory, request.getHwmTransPush(), request.getTransactionJournal());
+		
+		deviceHistory.setHwmChildPush(request.getHwmChildPush());
+		deviceHistory.setHwmChildMasterPush(request.getHwmChildPush());
+		deviceHistory.setHwmTransPush(request.getHwmTransPush());
+		deviceHistory.setHwmTransMasterPush(request.getHwmTransPush());
+		deviceHistory.setHwmChildPull(response.getHwmChildPull());
+		deviceHistory.setHwmTransPull(response.getHwmTransPull());
+		
+		em.merge(deviceHistory);
+		em.merge(masterHistory);
+		tx.commit();
+		return response;
+	}
+	
+	private long applyTransactionJournalToMaster(DeviceHistory deviceHistory,
+			DeviceHistory masterHistory) {
+		long result = deviceHistory.getHwmTransPull();
+		if (deviceHistory.getHwmTransMasterPush() >= deviceHistory.getHwmTransMasterPush()) {
+			return result;
+		}
+		TypedQuery<TransactionJournal> query = em.createNamedQuery("TransactionJournal.FindMasterPushJournalEntries", TransactionJournal.class);
+		query.setParameter("deviceId", deviceHistory.getDeviceId());
+		query.setParameter("masterPushJournalId", deviceHistory.getHwmTransMasterPush());
+		query.setParameter("pushJournalId", deviceHistory.getHwmTransPush());
+		
+		List<TransactionJournal> resultList = query.getResultList();
+		if (resultList.isEmpty()) {
+			return result;
+		}
+		Map<Long, Long> childMap = produceChildMap(deviceHistory, masterHistory);
+		Transaction transaction;
+		for (TransactionJournal journal: resultList) {
+			Long childId = childMap.get(journal.getChildId());
+			if (childId == null) {
+				throw new IllegalStateException("Unable to get a valid child ID for this transaction");
+			}
+			switch (journal.getTransactionType()) {
+			case CREATE:
+				transaction = new Transaction(masterHistory.getDeviceId(), childId, journal.getDate(), journal.getDescription(), journal.getAmount());
+				result = Math.max(result, transaction.persist(em, deviceHistory));
+				break;
+			case DELETE:
+				throw new UnsupportedOperationException("Only CREATE accepted for transactions");
+			case UPDATE:
+				throw new UnsupportedOperationException("Only CREATE accepted for transactions");
+			default:
+				throw new UnsupportedOperationException("Only CREATE / UPDATE / DELETE accepted for transactions");
+			}
+		}
+		return result;
+	}
+
+	private long applyChildJournalToMaster(DeviceHistory deviceHistory,	DeviceHistory masterHistory) {
+		long result = deviceHistory.getHwmChildPull();
+		if (deviceHistory.getHwmChildMasterPush() >= deviceHistory.getHwmChildMasterPush()) {
+			return result;
+		}
+		TypedQuery<ChildJournal> query = em.createNamedQuery("ChildJournal.FindMasterPushJournalEntries", ChildJournal.class);
+		query.setParameter("deviceId", deviceHistory.getDeviceId());
+		query.setParameter("masterPushJournalId", deviceHistory.getHwmChildMasterPush());
+		query.setParameter("pushJournalId", deviceHistory.getHwmChildPush());
+		
+		List<ChildJournal> resultList = query.getResultList();
+		for (ChildJournal journal: resultList) {
+			if (journal.getTransactionType() != TransactionType.CREATE) {
+				throw new UnsupportedOperationException("Only Create transactions are supported at this point");				
+			}
+			// TODO: Name collisions will cause duplicate named children - need to fix that.
+			Child child = new Child(masterHistory.getDeviceId(), journal.getName());
+			result = Math.max(result, child.persist(em, masterHistory));			
+		}
+		return result;		
 	}
 
 	private long findNewTransactionJournalEntries(
@@ -120,40 +207,34 @@ public class SynchronizeDevice {
 	}
 
 	@VisibleForTesting	
-	void mirrorChildJournalEntries(DeviceHistory deviceHistory,
-			DeviceHistory masterHistory, long hwmChildPush, List<ChildJournalEntry> childJournal) {
+	void mirrorChildJournalEntries(DeviceHistory deviceHistory,	long hwmChildPush, List<ChildJournalEntry> childJournal) {
 		if (childJournal.isEmpty()) {
 			return;
 		}
 		
-		EntityTransaction tx = em.getTransaction();
-		tx.begin();
 		for (ChildJournalEntry entry : childJournal) {
-			em.persist(new ChildJournal(entry.getJournalId(), deviceHistory, entry.getTransactionType(), 
-					new Instant(entry.getTimestampMillis()), entry.getChildId(), entry.getName()));
+			if (entry.getJournalId() > deviceHistory.getHwmChildPush()) {
+				em.persist(new ChildJournal(entry.getJournalId(), deviceHistory, entry.getTransactionType(), 
+						new Instant(entry.getTimestampMillis()), entry.getChildId(), entry.getName()));
+			}
 		}
 		deviceHistory.setHwmChildPush(hwmChildPush);
-		em.merge(deviceHistory);
-		tx.commit();
 	}
 
 	@VisibleForTesting	
-	void mirrorTransactionJournalEntries(DeviceHistory deviceHistory,
-			DeviceHistory masterHistory, long hwmTransPush, List<TransactionJournalEntry> transactionJournal) {
+	void mirrorTransactionJournalEntries(DeviceHistory deviceHistory, long hwmTransPush, List<TransactionJournalEntry> transactionJournal) {
 		if (transactionJournal.isEmpty()) {
 			return;
 		}
-		EntityTransaction tx = em.getTransaction();
-		tx.begin();
 		for (TransactionJournalEntry entry : transactionJournal) {
-			em.persist(new TransactionJournal(entry.getJournalId(), deviceHistory, entry.getTransactionType(), 
+			if (entry.getJournalId() > deviceHistory.getHwmTransPush()) {
+				em.persist(new TransactionJournal(entry.getJournalId(), deviceHistory, entry.getTransactionType(), 
 					new Instant(entry.getTimestampMillis()), 
 					entry.getTransactionId(), entry.getChildId(), entry.getDescription(), new Instant(entry.getDateMillis()),
 					entry.getAmount()));
+			}
 		}
 		deviceHistory.setHwmTransPush(hwmTransPush);
-		em.merge(deviceHistory);
-		tx.commit();
 	}
 	
 	private Map<Long, Long> produceChildMap(DeviceHistory deviceHistory, DeviceHistory masterHistory) {
@@ -189,8 +270,6 @@ public class SynchronizeDevice {
 		List<DeviceHistory> resultList = query.getResultList();
 		
 		Group group;
-		EntityTransaction tx = em.getTransaction();
-		tx.begin();
 
 		if (resultList.isEmpty()) {
 			UUID masterUUID = UUID.randomUUID();
@@ -204,7 +283,6 @@ public class SynchronizeDevice {
 		
 		deviceHistory = new DeviceHistory(deviceId, group, email, 0L, 0L, 0L, 0L, 0L, 0L);
 		em.persist(deviceHistory);
-		tx.commit();
 		
 		return deviceHistory;
 	}

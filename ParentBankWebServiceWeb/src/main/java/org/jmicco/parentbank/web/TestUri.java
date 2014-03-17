@@ -1,5 +1,7 @@
 package org.jmicco.parentbank.web;
 
+import java.util.UUID;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -15,7 +17,6 @@ import org.jmicco.parentbank.parentdb.Group;
 public class TestUri {
 	private EntityManagerFactory emf;
 	private final EntityManager em;
-	private static int counter = 1234;
 	
 	public TestUri() {
 		emf = Persistence.createEntityManagerFactory("production");
@@ -27,7 +28,7 @@ public class TestUri {
 	public String getMessage() {
 		
 		Group expectedGroup = new Group();
-		expectedGroup.setMasterId(Long.toString(counter++));
+		expectedGroup.setMasterId(UUID.randomUUID().toString());
 		
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
@@ -36,7 +37,7 @@ public class TestUri {
 		
 		Group actualGroup = em.find(Group.class, expectedGroup.getGroupId());
 				
-		return String.format("Hello, World : %d, %d", actualGroup.getGroupId(), actualGroup.getMasterId());
+		return String.format("Hello, World : %s, %s", actualGroup.getGroupId(), actualGroup.getMasterId());
 	}
 	
 	@Override

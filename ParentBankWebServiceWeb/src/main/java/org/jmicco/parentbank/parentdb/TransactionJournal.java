@@ -29,7 +29,9 @@ import com.sun.istack.Nullable;
 @Table(name = "transaction_journal", schema = "parentdb")
 @NamedQueries( {
 	@NamedQuery(name = "TransactionJournal.FindNewJournalEntries", 
-		query = "SELECT t FROM transaction_journal t WHERE t.key.deviceId = :deviceId AND t.key.journalId > :journalId")
+		query = "SELECT t FROM transaction_journal t WHERE t.key.deviceId = :deviceId AND t.key.journalId > :journalId"),
+	@NamedQuery(name = "TransactionJournal.FindMasterPushJournalEntries",
+		query = "SELECT t FROM transaction_journal t WHERE t.key.deviceId = :deviceId AND t.key.journalId > :masterPushJournalId and t.key.journalId <= :pushJournalId")
 })
 @EqualsAndHashCode
 @ToString
@@ -112,6 +114,8 @@ public class TransactionJournal {
 		}
 	}
 
+	@EqualsAndHashCode
+	@ToString
 	@Embeddable
 	private static class Key implements Serializable {
 		private static final long serialVersionUID = 1L;

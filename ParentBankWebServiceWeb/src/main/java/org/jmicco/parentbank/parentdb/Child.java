@@ -48,6 +48,8 @@ public class Child {
 		return key.deviceId;
 	}
 
+	@EqualsAndHashCode
+	@ToString
 	@Embeddable
 	private static class Key {
 		@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -69,12 +71,14 @@ public class Child {
 		return em.find(Child.class, key);
 	}
 	
-	public void persist(EntityManager em, DeviceHistory deviceHistory) {
+	public long persist(EntityManager em, DeviceHistory deviceHistory) {
 		em.persist(this);
 		em.flush();
 		long journalId = Sequence.generateId(em);
 		ChildJournal journalEntry = new ChildJournal(journalId, deviceHistory, TransactionType.CREATE, new Instant(), getChildId(), name);
 		em.persist(journalEntry);
+		em.flush();
+		return journalEntry.getJournalId();
 	}
 	
 	public void merge(EntityManager em, DeviceHistory deviceHistory) {

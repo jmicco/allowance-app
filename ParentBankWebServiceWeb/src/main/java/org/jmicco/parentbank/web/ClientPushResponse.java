@@ -12,7 +12,7 @@ import lombok.ToString;
 @XmlRootElement
 @EqualsAndHashCode
 @ToString
-public class ClientSynchronizationResponse {
+public class ClientPushResponse {
 	@Getter @Setter long hwmChildPull;  // The new hwm for child journal entries
 	@Getter @Setter long hwmTransPull;  // The new hwm for transaction journal entries
 	@Getter @Setter List<ChildJournalEntry> childJournal;

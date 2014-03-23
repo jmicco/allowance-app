@@ -102,7 +102,7 @@ public class ChildJournal {
 	@Embeddable
 	@EqualsAndHashCode
 	@ToString
-	private static class Key implements Serializable {
+	static class Key implements Serializable {
 		private static final long serialVersionUID = 1L;
 
 		long journalId;

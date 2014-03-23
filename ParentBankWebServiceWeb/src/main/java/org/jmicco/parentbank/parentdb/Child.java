@@ -51,7 +51,7 @@ public class Child {
 	@EqualsAndHashCode
 	@ToString
 	@Embeddable
-	private static class Key {
+	static class Key {
 		@GeneratedValue(strategy=GenerationType.IDENTITY)
 		private long childId;
 		private String deviceId;

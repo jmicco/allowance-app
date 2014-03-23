@@ -59,7 +59,7 @@ public class Transaction {
 	@Embeddable
 	@EqualsAndHashCode
 	@ToString
-	private static class Key {
+	static class Key {
 		@GeneratedValue(strategy=GenerationType.IDENTITY)
 		private long transactionId;
 		private String deviceId;

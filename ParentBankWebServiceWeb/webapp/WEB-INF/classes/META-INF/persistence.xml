@@ -11,7 +11,9 @@
 		<class>org.jmicco.parentbank.parentdb.Sequence</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties/>
-	</persistence-unit>	
+	</persistence-unit>
+	<!-- TODO(jmicco): Find a way to remove this stanza from the production WAR
+	     not needed for Maven, but testing from the Eclipse project wants it -->
 	<persistence-unit name="testing" transaction-type="RESOURCE_LOCAL">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<class>org.jmicco.parentbank.parentdb.Group</class>
@@ -28,9 +30,7 @@
             <property name="javax.persistence.jdbc.user" value="test" />
             <property name="javax.persistence.jdbc.password" value="" />
             <property name="hbm2ddl.auto" value="update" />
-
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
         </properties>
-        
 	</persistence-unit>	
 </persistence>

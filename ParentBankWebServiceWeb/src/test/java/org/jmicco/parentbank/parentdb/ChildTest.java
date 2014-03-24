@@ -2,6 +2,7 @@ package org.jmicco.parentbank.parentdb;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -93,5 +94,7 @@ public class ChildTest {
 		
 		actualJournal = resultList.get(0);
 		assertEquals(TransactionType.DELETE, actualJournal.getTransactionType());
+
+    fail("this test will always fail"); // Inject a failure - twice!
 	}
 }

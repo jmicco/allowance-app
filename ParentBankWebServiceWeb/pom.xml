@@ -46,7 +46,7 @@
 			<artifactId>glassfish-embedded-static-shell</artifactId>
 			<version>4.0</version>
 			<scope>system</scope>
-			<systemPath>/usr/local/google/home/jmicco/glassfish4/glassfish/lib/embedded/glassfish-embedded-static-shell.jar</systemPath>
+			<systemPath>${env.GLASSFISH_HOME}/glassfish/lib/embedded/glassfish-embedded-static-shell.jar</systemPath>
 		</dependency>
 	</dependencies>
 	<pluginRepositories>

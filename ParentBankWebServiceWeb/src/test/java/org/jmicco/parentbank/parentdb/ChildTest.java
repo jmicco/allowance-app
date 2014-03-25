@@ -94,5 +94,6 @@ public class ChildTest {
 		
 		actualJournal = resultList.get(0);
 		assertEquals(TransactionType.DELETE, actualJournal.getTransactionType());
+		fail("This is a failure");
 	}
 }

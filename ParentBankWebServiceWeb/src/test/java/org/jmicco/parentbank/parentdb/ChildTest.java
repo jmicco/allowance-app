@@ -2,7 +2,6 @@ package org.jmicco.parentbank.parentdb;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.util.List;
 

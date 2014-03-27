@@ -34,6 +34,7 @@
                   </sdk>
                   <deleteConflictingFiles>true</deleteConflictingFiles>
                   <undeployBeforeDeploy>true</undeployBeforeDeploy>
+                  <lazyLibraryUnpack>true</lazyLibraryUnpack>
               </configuration>
               <extensions>true</extensions>
           </plugin>

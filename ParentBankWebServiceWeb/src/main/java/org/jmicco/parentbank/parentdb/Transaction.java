@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import lombok.EqualsAndHashCode;
@@ -19,6 +21,10 @@ import org.joda.time.format.DateTimeFormatter;
 
 @Entity(name = "transactions")
 @Table(name = "transactions", schema = "parentdb")
+@NamedQueries( {
+	@NamedQuery(name = "Transaction.FindAllTransactions", 
+		query = "SELECT t FROM transactions t WHERE t.key.deviceId = :deviceId and t.childId = :childId")
+})
 @EqualsAndHashCode
 @ToString
 public class Transaction {
@@ -77,6 +83,10 @@ public class Transaction {
 	public long getTransactionId() {
 		return key.transactionId;
 	}
+
+	void setTransactionId(long transactionId) {
+		key.transactionId = transactionId;
+	}
 	
 	public String getDeviceId() {
 		return key.deviceId;
@@ -109,5 +119,4 @@ public class Transaction {
 		TransactionJournal journalEntry = new TransactionJournal(journalId, deviceHistory, TransactionType.DELETE, new Instant(), getTransactionId(), getChildId(), getDescription(), getDate(), getAmount());
 		em.persist(journalEntry);
 	}
-
 }

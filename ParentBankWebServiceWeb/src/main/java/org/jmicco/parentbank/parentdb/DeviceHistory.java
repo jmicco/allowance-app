@@ -1,12 +1,16 @@
 package org.jmicco.parentbank.parentdb;
 
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.TypedQuery;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -55,5 +59,11 @@ public class DeviceHistory {
 		this.hwmTransPush = hwmTransPush;
 		this.hwmTransPull = hwmTansPull;
 		this.email = email;
+	}
+
+	List<Child> getChildren(EntityManager em) {
+		TypedQuery<Child> query = em.createNamedQuery("Child.FindAllChildren", Child.class);
+		query.setParameter("deviceId", getDeviceId());
+		return query.getResultList();
 	}
 }

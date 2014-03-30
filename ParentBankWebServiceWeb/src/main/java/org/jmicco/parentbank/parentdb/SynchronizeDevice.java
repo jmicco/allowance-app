@@ -16,6 +16,7 @@ import org.jmicco.parentbank.web.TransactionJournalEntry;
 import org.joda.time.Instant;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -137,7 +138,7 @@ public class SynchronizeDevice {
 			switch (journal.getTransactionType()) {
 			case CREATE:
 				transaction = new Transaction(masterHistory.getDeviceId(), childId, journal.getDate(), journal.getDescription(), journal.getAmount());
-				result = Math.max(result, transaction.persist(em, deviceHistory));
+				result = Math.max(result, transaction.persist(em, masterHistory));
 				break;
 			case DELETE:
 				throw new UnsupportedOperationException("Only CREATE accepted for transactions");
@@ -165,9 +166,11 @@ public class SynchronizeDevice {
 			if (journal.getTransactionType() != TransactionType.CREATE) {
 				throw new UnsupportedOperationException("Only Create transactions are supported at this point");				
 			}
-			// TODO: Name collisions will cause duplicate named children - need to fix that.
-			Child child = new Child(masterHistory.getDeviceId(), journal.getName());
-			result = Math.max(result, child.persist(em, masterHistory));			
+			Optional<Child> optChild = Child.findByName(em, journal.getName(), masterHistory);
+			if (!optChild.isPresent()) {
+				Child child = new Child(masterHistory.getDeviceId(), journal.getName());
+				result = Math.max(result, child.persist(em, masterHistory));				
+			}
 		}
 		return result;		
 	}

@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NamedQuery;
 import javax.persistence.TypedQuery;
 
 import org.jmicco.parentbank.web.ChildJournalEntry;
@@ -116,7 +115,7 @@ public class SynchronizeDevice {
 	private long applyTransactionJournalToMaster(DeviceHistory deviceHistory,
 			DeviceHistory masterHistory) {
 		long result = deviceHistory.getHwmTransPull();
-		if (deviceHistory.getHwmTransMasterPush() >= deviceHistory.getHwmTransMasterPush()) {
+		if (deviceHistory.getHwmTransMasterPush() >= deviceHistory.getHwmTransPush()) {
 			return result;
 		}
 		TypedQuery<TransactionJournal> query = em.createNamedQuery("TransactionJournal.FindMasterPushJournalEntries", TransactionJournal.class);
@@ -153,7 +152,7 @@ public class SynchronizeDevice {
 
 	private long applyChildJournalToMaster(DeviceHistory deviceHistory,	DeviceHistory masterHistory) {
 		long result = deviceHistory.getHwmChildPull();
-		if (deviceHistory.getHwmChildMasterPush() >= deviceHistory.getHwmChildMasterPush()) {
+		if (deviceHistory.getHwmChildMasterPush() >= deviceHistory.getHwmChildPush()) {
 			return result;
 		}
 		TypedQuery<ChildJournal> query = em.createNamedQuery("ChildJournal.FindMasterPushJournalEntries", ChildJournal.class);
@@ -240,9 +239,7 @@ public class SynchronizeDevice {
 	private Map<Long, Long> produceChildMap(DeviceHistory deviceHistory, DeviceHistory masterHistory) {
 		Map<Long, Long> result = Maps.newHashMap();
 		
-		TypedQuery<Child> query = em.createNamedQuery("Child.FindAllChildren", Child.class);
-		query.setParameter("deviceId", masterHistory.getDeviceId());
-		List<Child> resultList = query.getResultList();
+		List<Child> resultList = masterHistory.getChildren(em);
 		Map<String, Child> nameToChild = Maps.newHashMap();
 		for (Child c : resultList) {
 			nameToChild.put(c.getName(), c);

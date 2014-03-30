@@ -1,5 +1,7 @@
 package org.jmicco.parentbank.parentdb;
 
+import java.util.List;
+
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -9,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.TypedQuery;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,6 +19,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import org.joda.time.Instant;
+
+import com.google.common.annotations.VisibleForTesting;
 
 @Entity(name = "child")
 @Table(name = "child", schema = "parentdb")
@@ -48,6 +53,11 @@ public class Child {
 		return key.deviceId;
 	}
 
+	@VisibleForTesting
+	void setChildId(long childId) {
+		key.childId = childId;
+	}
+	
 	@EqualsAndHashCode
 	@ToString
 	@Embeddable
@@ -94,4 +104,12 @@ public class Child {
 		ChildJournal journalEntry = new ChildJournal(journalId, deviceHistory, TransactionType.DELETE, new Instant(), getChildId(), name);
 		em.persist(journalEntry);
 	}
+
+	public List<Transaction> getTransactions(EntityManager em) {
+		TypedQuery<Transaction> query = em.createNamedQuery("Transaction.FindAllTransactions", Transaction.class);
+		query.setParameter("deviceId", getDeviceId());
+		query.setParameter("childId", getChildId());
+		return query.getResultList();
+	}
+
 }

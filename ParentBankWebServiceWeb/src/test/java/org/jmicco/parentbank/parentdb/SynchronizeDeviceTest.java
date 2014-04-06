@@ -38,6 +38,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+/**
+ * Tests for the device synchronization logic
+ * @author john
+ *
+ */
 public class SynchronizeDeviceTest {
 	private static final long TIMESTAMP = 10000L;
 	private TestDatabaseHelper helper;

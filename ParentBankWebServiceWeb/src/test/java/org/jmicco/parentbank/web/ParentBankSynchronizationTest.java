@@ -17,5 +17,6 @@ public class ParentBankSynchronizationTest {
 	public void testGetHello() {
 		User expectedUser = new User("john.micco@gmail.com");
 		assertEquals(expectedUser.getEmail(), sync.getHello().getEmail());
+		assertTrue(false);
 	}
 }

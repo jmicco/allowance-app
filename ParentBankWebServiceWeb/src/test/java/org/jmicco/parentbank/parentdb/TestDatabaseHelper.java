@@ -28,7 +28,6 @@ public class TestDatabaseHelper {
 		
 		File file = new File(em.getClass().getClassLoader().getResource("").getPath());
 		file = new File(file, "../../../Database/server_parentdb.sql");
-		System.out.println("PATH: " + file.getPath());
 		InputStream inputSql = new FileInputStream(file);
 		String sql = convertStringToString(inputSql);
 		
@@ -37,7 +36,7 @@ public class TestDatabaseHelper {
 		String [] statements = sql.split(";");
 		for (String statement : statements) {
 			PreparedStatement preparedStatement = connection.prepareStatement(statement);
-			logger.info("executing: " + statement);
+			logger.fine("executing: " + statement);
 			preparedStatement.execute();
 		}
 		
@@ -46,7 +45,7 @@ public class TestDatabaseHelper {
 		ResultSet resultSet = preparedStatement.getResultSet();
 		resultSet.first();
 		while (!resultSet.isAfterLast()) {
-			logger.info("Table: " + resultSet.getString(1) + " schema: " + resultSet.getString(2));
+			logger.fine("Table: " + resultSet.getString(1) + " schema: " + resultSet.getString(2));
 			resultSet.next();
 		}
 		tx.commit();

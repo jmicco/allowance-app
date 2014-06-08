@@ -45,6 +45,40 @@ public class SynchronizeDeviceTest {
 	private SynchronizeDevice synchronizer;
 	private EntityTransaction tx;
 	
+	private static String DEVICE1 = UUID.randomUUID().toString();
+	private static String DEVICE2 = UUID.randomUUID().toString();
+	private static String CHILD1 = "child1";
+	private static String CHILD2 = "child2";
+	private static String CHILD3 = "child3";
+	private static Child DEV1_CHILD1 = new Child(DEVICE1, CHILD1);
+	private static Child DEV2_CHILD1 = new Child(DEVICE2, CHILD1);
+	private static Child DEV1_CHILD2 = new Child(DEVICE1, CHILD2);
+	private static Child DEV2_CHILD2 = new Child(DEVICE2, CHILD2);
+    private static Child DEV1_CHILD3 = new Child(DEVICE1, CHILD3);
+	private static Child DEV2_CHILD3 = new Child(DEVICE2, CHILD3);
+	private static String EMAIL = "nobody@nowhere.com";
+	private static String EMAIL2 = "noone@nowhere.com";
+	    
+	private static Scenario SIMPLE_SCENARIO = new Scenario(
+	        ImmutableMap.of(DEV1_CHILD1.getName(), DEV1_CHILD1),
+            ImmutableMultimap.of(
+                    DEV1_CHILD1.getName(), new Transaction(DEVICE1, 0, new Instant(TIMESTAMP), "dev1 child1 CT1", 1.0)
+            ));
+	
+	private static Scenario SCENARIO1 = new Scenario(
+	        ImmutableMap.of(DEV1_CHILD2.getName(), DEV1_CHILD2, DEV1_CHILD3.getName(), DEV1_CHILD3),
+	        ImmutableMultimap.of(
+	        DEV1_CHILD2.getName(), new Transaction(DEVICE1, 0, new Instant(TIMESTAMP), "dev1 child2 CT1", 3.0),
+	        DEV1_CHILD3.getName(), new Transaction(DEVICE1, 0, new Instant(TIMESTAMP), "dev1 child3 CT1", 6.0)          
+	        ));
+	    
+	private static Scenario SCENARIO2 = new Scenario(
+	        ImmutableMap.of(DEV2_CHILD1.getName(), DEV2_CHILD1, DEV2_CHILD2.getName(), DEV2_CHILD2),
+	        ImmutableMultimap.of(
+	                DEV2_CHILD1.getName(), new Transaction(DEVICE2, 0, new Instant(TIMESTAMP), "dev2 child1 CT1", 9.0),
+	                DEV2_CHILD2.getName(), new Transaction(DEVICE2, 0, new Instant(TIMESTAMP), "dev2 child2 CT1", 12.0)         
+	        ));
+	
 	@Before
 	public void setUp() throws Exception {
 		helper = new TestDatabaseHelper();
@@ -65,11 +99,11 @@ public class SynchronizeDeviceTest {
 	@Test
 	public void testfindOrCreateDeviceHistoryNew() {
 		tx.begin();
-		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
+		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory(DEVICE1, EMAIL);
 		tx.commit();
 		assertNotNull(deviceHistory);
-		assertEquals("nobody@nowhere.com", deviceHistory.getEmail());
-		assertEquals("device1234", deviceHistory.getDeviceId());
+		assertEquals(EMAIL, deviceHistory.getEmail());
+		assertEquals(DEVICE1, deviceHistory.getDeviceId());
 		assertNotNull(deviceHistory.getGroup().getMasterId());
 		assertEquals(0L, deviceHistory.getHwmChildPull());
 		assertEquals(0L, deviceHistory.getHwmChildPush());
@@ -81,10 +115,10 @@ public class SynchronizeDeviceTest {
 	@Test
 	public void testfindOrCreateDeviceHistoryExists() {
 		tx.begin();
-		DeviceHistory expectedDeviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
+		DeviceHistory expectedDeviceHistory = synchronizer.findOrCreateDeviceHistory(DEVICE1, EMAIL);
 		tx.commit();
 		tx.begin();
-		DeviceHistory actualDeviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
+		DeviceHistory actualDeviceHistory = synchronizer.findOrCreateDeviceHistory(DEVICE1, EMAIL);
 		tx.commit();
 		assertSame(expectedDeviceHistory, actualDeviceHistory);
 	}
@@ -92,10 +126,10 @@ public class SynchronizeDeviceTest {
 	@Test
 	public void testfindOrCreateDeviceHistorySameEmail() {
 		tx.begin();
-		DeviceHistory deviceHistory1234 = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
+		DeviceHistory deviceHistory1234 = synchronizer.findOrCreateDeviceHistory(DEVICE1, EMAIL);
 		tx.commit();
 		tx.begin();
-		DeviceHistory deviceHistory1235 = synchronizer.findOrCreateDeviceHistory("device1235", "nobody@nowhere.com");
+		DeviceHistory deviceHistory1235 = synchronizer.findOrCreateDeviceHistory(DEVICE2, EMAIL);
 		tx.commit();
 		
 		assertNotSame(deviceHistory1234, deviceHistory1235);
@@ -105,10 +139,10 @@ public class SynchronizeDeviceTest {
 	@Test
 	public void testfindOrCreateDeviceHistoryDifferentEmail() {
 		tx.begin();
-		DeviceHistory deviceHistory1234 = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
+		DeviceHistory deviceHistory1234 = synchronizer.findOrCreateDeviceHistory(DEVICE1, EMAIL);
 		tx.commit();
 		tx.begin();
-		DeviceHistory deviceHistory1235 = synchronizer.findOrCreateDeviceHistory("device1235", "noone@nowhere.com");
+		DeviceHistory deviceHistory1235 = synchronizer.findOrCreateDeviceHistory(DEVICE2, EMAIL2);
 		tx.commit();
 
 		assertNotSame(deviceHistory1234, deviceHistory1235);
@@ -117,20 +151,15 @@ public class SynchronizeDeviceTest {
 	
 	@Test
 	public void testMirrorChildJournalEntries() {
-		tx.begin();
-		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");		
-		ChildJournalEntry childJournalEntry = new ChildJournalEntry(1L, TransactionType.CREATE, 1000L, 1, "childname");
-		List<ChildJournalEntry> childJournal = ImmutableList.of(childJournalEntry);
-		assertEquals(0L, deviceHistory.getHwmChildPush());
+	    ClientPushPullRequest request = SIMPLE_SCENARIO.createPushRequest();
+	    synchronizer.push(request);
+
+		DeviceHistory deviceHistory = em.find(DeviceHistory.class, DEVICE1);
+		assertNotNull(deviceHistory);
+        ChildJournal journal = ChildJournal.find(em, 1L, deviceHistory);
+        assertNotNull(journal);		
 		
-		synchronizer.mirrorChildJournalEntries(
-				deviceHistory, 1L, childJournal);
-		ChildJournal journal = ChildJournal.find(em, 1L, deviceHistory);
-		tx.commit();
-		
-		assertNotNull(journal);
-		
-		
+        ChildJournalEntry childJournalEntry = request.getChildJournal().get(0);
 		assertEquals(childJournalEntry.getChildId(), journal.getChildId());
 		assertEquals(childJournalEntry.getJournalId(), journal.getJournalId());
 		assertEquals(new Instant(childJournalEntry.getTimestampMillis()), journal.getTimestamp());
@@ -143,15 +172,13 @@ public class SynchronizeDeviceTest {
 	
 	@Test
 	public void testMirrorTransactionJournalEntries() {
-		tx.begin();
-		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
-		TransactionJournalEntry transactionJournalEntry = new TransactionJournalEntry(1L, TransactionType.CREATE, 1000L, 1L, 2L, "description", 0L, 10.50);
-		List<TransactionJournalEntry> transactionJournal = ImmutableList.of(transactionJournalEntry);
-		assertEquals(0L, deviceHistory.getHwmChildPush());
-		
-		synchronizer.mirrorTransactionJournalEntries(
-				deviceHistory, 1L, transactionJournal);
-		tx.commit();
+        ClientPushPullRequest request = SIMPLE_SCENARIO.createPushRequest();
+        synchronizer.push(request);
+        
+        DeviceHistory deviceHistory = em.find(DeviceHistory.class, DEVICE1);
+        assertNotNull(deviceHistory);
+
+		TransactionJournalEntry transactionJournalEntry = request.getTransactionJournal().get(0);		
 		TransactionJournal journal = TransactionJournal.find(em, 1L, deviceHistory);
 		assertNotNull(journal);
 		
@@ -173,7 +200,7 @@ public class SynchronizeDeviceTest {
 	@Test
 	public void testPush() {
 		tx.begin();
-		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
+		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory(DEVICE1, EMAIL);
 		DeviceHistory masterHistory = em.find(DeviceHistory.class, deviceHistory.getGroup().getMasterId());
 		
 		Child child1 = new Child(masterHistory.getDeviceId(), "child1");
@@ -196,7 +223,7 @@ public class SynchronizeDeviceTest {
 				new TransactionJournalEntry(2L, TransactionType.CREATE, TIMESTAMP, 2L, 2L, "child3 CT1", 20000L, 6.0)
 		);
 		ClientPushPullRequest request = 
-				new ClientPushPullRequest(deviceHistory.getDeviceId(), "nobody@nowhere.com", 0L, 2L, 0L, 2L, childJournal, transactionJournal);
+				new ClientPushPullRequest(deviceHistory.getDeviceId(), EMAIL, 0L, 2L, 0L, 2L, childJournal, transactionJournal);
 		ClientPushResponse response = synchronizer.push(request);
 		assertEquals(2, response.getHwmChildPull());
 		assertEquals(4, response.getHwmTransPull());
@@ -229,7 +256,7 @@ public class SynchronizeDeviceTest {
 	
 	@Test
 	public void testPushPastHwm() {
-		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory("device1234", "nobody@nowhere.com");
+		DeviceHistory deviceHistory = synchronizer.findOrCreateDeviceHistory(DEVICE1, EMAIL);
 		
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
@@ -246,7 +273,7 @@ public class SynchronizeDeviceTest {
 				new TransactionJournalEntry(2L, TransactionType.CREATE, TIMESTAMP, 2L, 2L, "child3 CT1", 20000L, 6.0)
 		);
 		ClientPushPullRequest request = 
-				new ClientPushPullRequest(deviceHistory.getDeviceId(), "nobody@nowhere.com", 0L, 2L, 0L, 2L, childJournal, transactionJournal);
+				new ClientPushPullRequest(deviceHistory.getDeviceId(), EMAIL, 0L, 2L, 0L, 2L, childJournal, transactionJournal);
 		ClientPushResponse response = synchronizer.push(request);
 		assertEquals(0L, response.getHwmChildPull());
 		assertEquals(0L, response.getHwmTransPull());
@@ -262,48 +289,18 @@ public class SynchronizeDeviceTest {
 		deviceTransJournal = TransactionJournal.find(em, 2L, deviceHistory);
 		assertNull(deviceTransJournal);
 	}
-	private static String DEVICE1 = UUID.randomUUID().toString();
-	private static String DEVICE2 = UUID.randomUUID().toString();
-	private static Child DEV2_CHILD1 = new Child(DEVICE2, "child1");
-	private static Child DEV1_CHILD2 = new Child(DEVICE1, "child2");
-	private static Child DEV2_CHILD2 = new Child(DEVICE2, "child2");
-	private static Child DEV1_CHILD3 = new Child(DEVICE1, "child3");
-	private static String EMAIL = "nobody@nowhere.com";
-	
-	private static class Scenario {
-		@Getter private final ImmutableMap<String, Child> childMap;
-		@Getter private final ImmutableMultimap<String, Transaction> transactionMap;
-		
-		public Scenario(ImmutableMap<String, Child> childMap, 
-				ImmutableMultimap<String, Transaction> transactionMap) {
-			this.childMap = childMap;
-			this.transactionMap = transactionMap;
-		}
-	}
-	private static Scenario SCENARIO1 = new Scenario(
-			ImmutableMap.of(DEV1_CHILD2.getName(), DEV1_CHILD2, DEV1_CHILD3.getName(), DEV1_CHILD3),
-			ImmutableMultimap.of(
-			DEV1_CHILD2.getName(), new Transaction(DEVICE1, 0, new Instant(TIMESTAMP), "dev1 child2 CT1", 3.0),
-			DEV1_CHILD3.getName(), new Transaction(DEVICE1, 0, new Instant(TIMESTAMP), "dev1 child3 CT1", 6.0)			
-			));
-	
-	private static Scenario SCENARIO2 = new Scenario(
-			ImmutableMap.of(DEV2_CHILD1.getName(), DEV2_CHILD1, DEV2_CHILD2.getName(), DEV2_CHILD2),
-			ImmutableMultimap.of(
-					DEV2_CHILD1.getName(), new Transaction(DEVICE2, 0, new Instant(TIMESTAMP), "dev2 child1 CT1", 9.0),
-					DEV2_CHILD2.getName(), new Transaction(DEVICE2, 0, new Instant(TIMESTAMP), "dev2 child2 CT1", 12.0)			
-			));
+
 	
 	@Test
 	public void testPushPullCycle() {		
-		ClientPushPullRequest request = createPushRequest(SCENARIO1);
+		ClientPushPullRequest request = SCENARIO1.createPushRequest();
 		
 		ClientPushResponse response = synchronizer.push(request);
 		
 		assertEquals(0, response.getChildJournal().size());
 		assertEquals(0, response.getTransactionJournal().size());
 		
-		request = createPullRequest(SCENARIO1, request);
+		request = SCENARIO1.createPullRequest(request);
 		
 		ClientPullResponse pullResponse = synchronizer.pull(request);
 		assertEquals(2, pullResponse.getHwmChildPull());
@@ -314,11 +311,11 @@ public class SynchronizeDeviceTest {
 
 	@Test
 	public void testBiDirectional() {		
-		ClientPushPullRequest request = createPushRequest(SCENARIO1);
+		ClientPushPullRequest request = SCENARIO1.createPushRequest();
 		ClientPushResponse response = synchronizer.push(request);
-		ClientPullResponse pullResponse = synchronizer.pull(createPullRequest(SCENARIO1, request));
+		ClientPullResponse pullResponse = synchronizer.pull(SCENARIO1.createPullRequest(request));
 		
-		ClientPushPullRequest request2 = createPushRequest(SCENARIO2);
+		ClientPushPullRequest request2 = SCENARIO1.createPushRequest();
 		ClientPushResponse response2 = synchronizer.push(request);
 		verifyScenario1MirroredFromMaster(SCENARIO1, SCENARIO2, response2);
 
@@ -330,7 +327,7 @@ public class SynchronizeDeviceTest {
 		Map <Long, String> childMap = Maps.newHashMap();
 		for (ChildJournalEntry entry : response.getChildJournal()) {
 			assertTrue(scenario1Names.contains(entry.getName()));
-			//TODO: What happens when you alreay got this child and there is not already one.
+			//TODO: What happens when you already got this child and there is not already one.
 			// Need to store the mapping from Remote Child ID to local Child ID somehow?
 			childMap.put(entry.getChildId(), entry.getName());
 		}
@@ -368,50 +365,61 @@ public class SynchronizeDeviceTest {
 		}
 	}
 
-	private ClientPushPullRequest createPullRequest(Scenario scenario, ClientPushPullRequest pushRequest) {		
-		return new ClientPushPullRequest(pushRequest.getDeviceId(), pushRequest.getEmail(),
-				pushRequest.getHwmChildPull(),
-				pushRequest.getHwmChildPush(), 
-				pushRequest.getHwmTransPull(), 
-				pushRequest.getHwmTransPush(), 
-				ImmutableList.<ChildJournalEntry>of(), 
-				ImmutableList.<TransactionJournalEntry>of());
-	}
+    private static class Scenario {
+        @Getter private final ImmutableMap<String, Child> childMap;
+        @Getter private final ImmutableMultimap<String, Transaction> transactionMap;
+        
+        public Scenario(ImmutableMap<String, Child> childMap, 
+                ImmutableMultimap<String, Transaction> transactionMap) {
+            this.childMap = childMap;
+            this.transactionMap = transactionMap;
+        }
+        
+        ClientPushPullRequest createPushRequest() {        
+            List<ChildJournalEntry> childJournal = createChildJournal();       
+            List<TransactionJournalEntry> transactionJournal = createTransactionJournal();
+            
+            String deviceId = getChildMap().values().iterator().next().getDeviceId();
+            return new ClientPushPullRequest(deviceId, EMAIL, 
+                    0L, childJournal.size(), 
+                    0L, transactionJournal.size(), 
+                    childJournal, transactionJournal);        
+        }
 
-	private ClientPushPullRequest createPushRequest(Scenario scenario) {		
-		List<ChildJournalEntry> childJournal = createChildJournal(SCENARIO1);		
-		List<TransactionJournalEntry> transactionJournal = createTransactionJournal(SCENARIO1);
-		
-		String deviceId = scenario.getChildMap().values().iterator().next().getDeviceId();
-		return new ClientPushPullRequest(deviceId, EMAIL, 
-				0L, childJournal.size(), 
-				0L, transactionJournal.size(), 
-				childJournal, transactionJournal);
-	}
-
-	private List<TransactionJournalEntry> createTransactionJournal(Scenario scenario) {
-		long journalKey = 1;
-		long transactionKey = 1;
-		List<TransactionJournalEntry> result = Lists.newArrayList();
-		for (Entry<String, Transaction> entry : scenario.getTransactionMap().entries()) {
-			Transaction transaction = entry.getValue();
-			Child child = scenario.getChildMap().get(entry.getKey());
-			
-			transaction.setTransactionId(transactionKey++);
-			result.add(new TransactionJournalEntry(journalKey++, TransactionType.CREATE, TIMESTAMP, transaction.getTransactionId(), 
-					child.getChildId(), transaction.getDescription(), transaction.getDate().getMillis(), transaction.getAmount()));			
-		}
-		return result;
-	}
-
-	private List<ChildJournalEntry> createChildJournal(Scenario scenario) {
-		List<ChildJournalEntry> result = Lists.newArrayList();
-		long childKey = 1;
-		long journalKey = 1;
-		for (Child child : scenario.getChildMap().values()) {
-			child.setChildId(childKey++);
-			result.add(new ChildJournalEntry(journalKey++, TransactionType.CREATE, TIMESTAMP, child.getChildId(), child.getName()));
-		}
-		return result;
-	}
+        List<ChildJournalEntry> createChildJournal() {
+            List<ChildJournalEntry> result = Lists.newArrayList();
+            long childKey = 1;
+            long journalKey = 1;
+            for (Child child : getChildMap().values()) {
+                child.setChildId(childKey++);
+                result.add(new ChildJournalEntry(journalKey++, TransactionType.CREATE, TIMESTAMP, child.getChildId(), child.getName()));
+            }
+            return result;
+        }
+        
+        List<TransactionJournalEntry> createTransactionJournal() {
+            long journalKey = 1;
+            long transactionKey = 1;
+            List<TransactionJournalEntry> result = Lists.newArrayList();
+            for (Entry<String, Transaction> entry : getTransactionMap().entries()) {
+                Transaction transaction = entry.getValue();
+                Child child = getChildMap().get(entry.getKey());
+                
+                transaction.setTransactionId(transactionKey++);
+                result.add(new TransactionJournalEntry(journalKey++, TransactionType.CREATE, TIMESTAMP, transaction.getTransactionId(), 
+                        child.getChildId(), transaction.getDescription(), transaction.getDate().getMillis(), transaction.getAmount()));         
+            }
+            return result;
+        }
+        
+        private ClientPushPullRequest createPullRequest(ClientPushPullRequest pushRequest) {     
+            return new ClientPushPullRequest(pushRequest.getDeviceId(), pushRequest.getEmail(),
+                    pushRequest.getHwmChildPull(),
+                    pushRequest.getHwmChildPush(), 
+                    pushRequest.getHwmTransPull(), 
+                    pushRequest.getHwmTransPush(), 
+                    ImmutableList.<ChildJournalEntry>of(), 
+                    ImmutableList.<TransactionJournalEntry>of());
+        }
+    }
 }
